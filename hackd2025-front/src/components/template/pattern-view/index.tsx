@@ -1,10 +1,12 @@
 import React from 'react';
+import Image from 'next/image';
 import { PatternPreview } from '@/components/module/PatternPreview';
 import { PatternDetailModal } from '@/components/module/PatternDetailModal';
 import Button from '@/components/part/Button';
 import Loading from '@/components/part/Loading';
 import { BeadCounts } from '@/types/index';
 import backgroundImage from '@/assets/background.png';
+import previousIcon from '@/assets/previous.png';
 
 interface PatternData {
   id: string;
@@ -163,6 +165,19 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
                   onSelect={handlePatternSelect}
                 />
               ))}
+            </div>
+
+            {/* アクションボタン */}
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={onBack}
+                className="flex flex-col items-center justify-center gap-2 transition-opacity hover:opacity-80 w-[180px] h-[180px] bg-white rounded-full shadow-lg"
+              >
+                <Image src={previousIcon} alt="戻る" width={120} height={120} />
+                <span className="text-gray-900 font-semibold text-xl">
+                  Previous
+                </span>
+              </button>
             </div>
           </>
         )}

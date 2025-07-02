@@ -4,11 +4,27 @@ import '@testing-library/jest-dom';
 import { PatternViewScreen } from './index';
 import { BeadCounts } from '@/types/index';
 
+// Next.js Imageコンポーネントのモック
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} {...props} />
+  ),
+}));
+
 // 画像アセットのモック
 jest.mock('@/assets/background.png', () => ({
   __esModule: true,
   default: {
     src: '/mock-background.png'
+  }
+}));
+
+jest.mock('@/assets/previous.png', () => ({
+  __esModule: true,
+  default: {
+    src: '/mock-previous.png'
   }
 }));
 
@@ -161,6 +177,20 @@ describe('PatternViewScreen', () => {
       
       expect(screen.getByTestId('pattern-preview-1')).toBeInTheDocument();
       expect(screen.getByTestId('pattern-preview-2')).toBeInTheDocument();
+    });
+
+    it('戻るボタンが表示される', () => {
+      render(<PatternViewScreen {...mockProps} />);
+      
+      expect(screen.getByText('Previous')).toBeInTheDocument();
+    });
+
+    it('戻るボタンをクリックするとonBackが呼ばれる', () => {
+      const mockOnBack = jest.fn();
+      render(<PatternViewScreen {...mockProps} onBack={mockOnBack} />);
+      
+      fireEvent.click(screen.getByText('Previous'));
+      expect(mockOnBack).toHaveBeenCalledTimes(1);
     });
   });
 
