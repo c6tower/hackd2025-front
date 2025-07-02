@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { BeadColor, BeadCounts } from '@/types';
 import BeadInput from '@/components/part/BeadInput';
 import backgroundImage from '@/assets/background.png';
+import resetIcon from '@/assets/reset.png';
+import nextIcon from '@/assets/next.png';
 
 const BEAD_COLORS_ORDER: BeadColor[] = [
   'red', 'orange', 'yellow', 'green', 'blue', 
@@ -58,17 +61,29 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
       }}
     >
       <div className="max-w-2xl mx-auto pt-8 pb-8 px-4">
-        {/* タイトル */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-            アイロンビーズ
-          </h1>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-            図案提案アプリ
-          </h2>
-          <p className="text-sm sm:text-base text-gray-600">
-            手持ちのビーズ数を設定してください
-          </p>
+        {/* ステップタイトル */}
+        <div className="text-center mb-6">
+          {/* タイトルと言語切り替えボタンの横並び */}
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="inline-block text-white font-bold rounded-full relative text-3xl px-8 py-4 bg-purple-400">
+              ① Start !
+              <span className="absolute top-1/2 -translate-y-1/2 left-full -ml-1 w-0 h-0 border-t-[16px] border-b-[16px] border-l-[20px] border-transparent border-l-purple-400" />
+            </h1>
+            
+            {/* 言語切り替えボタン */}
+            <div className="flex gap-2">
+              <button className="w-12 h-12 bg-purple-400 text-white text-xl font-bold rounded-full hover:opacity-80 transition-opacity">
+                日
+              </button>
+              <button className="w-12 h-12 bg-purple-400 text-white text-xl font-bold rounded-full hover:opacity-80 transition-opacity">
+                EN
+              </button>
+            </div>
+          </div>
+          
+          <div className="inline-block text-gray-900 font-bold rounded-full text-2xl px-6 py-3 bg-white">
+            Slide to choose how many colors you like.
+          </div>
         </div>
 
         {/* ビーズ入力フォーム */}
@@ -88,28 +103,34 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
         </div>
 
         {/* アクションボタン */}
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
             <button
               onClick={handleReset}
               disabled={!hasAnyBeads}
-              className="w-full sm:w-auto px-6 py-3 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              className="flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-80 w-[180px] h-[180px] bg-white rounded-full shadow-lg"
             >
-              リセット
+              <Image src={resetIcon} alt="リセット" width={120} height={120} />
+              <span className="text-gray-900 font-semibold text-xl">
+                Reset
+              </span>
             </button>
             
             <button
               onClick={handleSubmit}
               disabled={!hasAnyBeads}
-              className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              className="flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-80 w-[180px] h-[180px] bg-white rounded-full shadow-lg"
             >
-              図案を提案する
+              <Image src={nextIcon} alt="次へ" width={120} height={120} />
+              <span className="text-gray-900 font-semibold text-xl">
+                Next
+              </span>
             </button>
           </div>
 
           {/* ヘルプテキスト */}
           {!hasAnyBeads && (
-            <div className="mt-4 text-center text-gray-500 text-xs sm:text-sm">
+            <div className="mt-6 text-center text-gray-500 text-xs sm:text-sm">
               ビーズ数を1個以上設定してください
             </div>
           )}
