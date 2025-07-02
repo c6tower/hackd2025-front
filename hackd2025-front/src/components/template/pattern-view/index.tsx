@@ -42,12 +42,7 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
 
   const handlePatternSelect = (id: string) => {
     setSelectedPatternId(id);
-  };
-
-  const handleDetailShow = () => {
-    if (selectedPatternId) {
-      setIsModalOpen(true);
-    }
+    setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
@@ -147,23 +142,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
                   onSelect={handlePatternSelect}
                 />
               ))}
-            </div>
-
-            {/* アクションボタン */}
-            <div className="flex justify-center gap-4">
-              <Button
-                onClick={handleDetailShow}
-                variant="primary"
-                disabled={!selectedPatternId}
-              >
-                詳細表示
-              </Button>
-              <Button
-                onClick={onBack}
-                variant="secondary"
-              >
-                戻る
-              </Button>
             </div>
           </>
         )}
