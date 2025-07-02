@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { BeadColor, BEAD_COLORS, BEAD_COLOR_NAMES, BEAD_COLOR_EMOJIS } from '@/types';
+import { BeadColor, BEAD_COLORS, BEAD_COLOR_NAMES, CSSPropertiesWithVars } from '@/types';
 
 interface BeadInputProps {
   color: BeadColor;
@@ -27,6 +27,31 @@ export default function BeadInput({
     onChange(newValue);
     setInputValue(newValue.toString());
   }, [onChange]);
+
+  // 背景グラデーション用の進捗率（つまみの位置と背景の丸みを考慮）
+  const getBackgroundProgress = useCallback(() => {
+    if (max === min) return 0;
+    
+    const progress = (value - min) / (max - min);
+    
+    // 背景の丸み部分を考慮した補正
+    // スライダーの実際の動作範囲は、つまみの中心が移動できる範囲
+    // つまみのサイズ20px、トラックの高さ6pxを考慮
+    
+    // 左右の余白をパーセンテージで設定（より小さく調整）
+    // つまみが完全に左端/右端にあるときに背景が適切に表示されるように
+    const edgePadding = 1.5; // 左右それぞれ1.5%の余白に縮小
+    
+    // 端の値での特別な処理
+    if (value === min) return edgePadding;
+    if (value === max) return 100 - edgePadding;
+    
+    // 有効な進行範囲は全体から両端の余白を除いた範囲
+    const effectiveRange = 100 - (edgePadding * 2);
+    const adjustedProgress = edgePadding + (progress * effectiveRange);
+    
+    return Math.max(edgePadding, Math.min(100 - edgePadding, adjustedProgress));
+  }, [value, min, max]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -96,12 +121,22 @@ export default function BeadInput({
 
   return (
     <div className="flex items-center gap-2 sm:gap-3 py-2">
-      {/* 色の表示 */}
-      <div className="flex items-center gap-1 sm:gap-2 w-16 sm:w-20">
-        <span className="text-base sm:text-lg">{BEAD_COLOR_EMOJIS[color]}</span>
-        <span className="text-xs sm:text-sm font-medium text-gray-700 truncate">
-          {BEAD_COLOR_NAMES[color]}
-        </span>
+      {/* スライダー */}
+      <div className="flex-1 relative min-w-0">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={value}
+          onChange={handleSliderChange}
+          className="w-full appearance-none cursor-pointer bead-slider h-5"
+          style={{
+            background: `linear-gradient(to right, ${BEAD_COLORS[color]} 0%, ${BEAD_COLORS[color]} ${getBackgroundProgress()}%, #e5e7eb ${getBackgroundProgress()}%, #e5e7eb 100%)`,
+            borderRadius: '9999px',
+            '--bead-color': BEAD_COLORS[color]
+          } as CSSPropertiesWithVars}
+          aria-label={`${BEAD_COLOR_NAMES[color]}の個数を設定`}
+        />
       </div>
 
       {/* ステッパー（マイナス） */}
@@ -117,43 +152,6 @@ export default function BeadInput({
       >
         -
       </button>
-
-      {/* スライダー */}
-      <div className="flex-1 relative min-w-0">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value}
-          onChange={handleSliderChange}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-          style={{
-            background: `linear-gradient(to right, ${BEAD_COLORS[color]} 0%, ${BEAD_COLORS[color]} ${(value / max) * 100}%, #e5e7eb ${(value / max) * 100}%, #e5e7eb 100%)`
-          }}
-          aria-label={`${BEAD_COLOR_NAMES[color]}の個数を設定`}
-        />
-        <style jsx>{`
-          input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: ${BEAD_COLORS[color]};
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-          }
-          input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: ${BEAD_COLORS[color]};
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-          }
-        `}</style>
-      </div>
 
       {/* 数値入力欄 */}
       <input

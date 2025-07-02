@@ -139,3 +139,8 @@ export const API_NAME_TO_BEAD_COLOR: Record<string, BeadColor> = {
   pink: 'pink',
   maroon: 'brown'
 } as const;
+
+// CSS変数を含むCSSPropertiesの型定義
+export interface CSSPropertiesWithVars extends React.CSSProperties {
+  [key: `--${string}`]: string | number;
+}
