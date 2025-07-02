@@ -48,7 +48,29 @@ type BeadColor = keyof typeof BEAD_COLORS;
 
 ### 基本型
 ```typescript
-interface BeadInputProps {
+// ビーズ色定義（10色）
+export const BEAD_COLORS = {
+  red: '#FF0000',
+  orange: '#FFA500', 
+  yellow: '#FFFF00',
+  green: '#008000',
+  blue: '#0000FF',
+  purple: '#800080',
+  black: '#000000',
+  white: '#FFFFFF',
+  pink: '#FFC0CB',
+  brown: '#A52A2A'
+} as const;
+
+export type BeadColor = keyof typeof BEAD_COLORS;
+
+// ビーズ使用数の型
+export type BeadCounts = {
+  [K in BeadColor]: number;
+}
+
+// コンポーネントProps型
+export interface BeadInputProps {
   color: BeadColor;
   value: number;
   onChange: (value: number) => void;
@@ -56,20 +78,30 @@ interface BeadInputProps {
   max?: number;
 }
 
-interface PatternGridProps {
+export interface PatternGridProps {
   pattern: string; // 256文字
   size?: 'small' | 'large'; // 選択画面 or モーダル
   interactive?: boolean;
 }
 
-interface PatternResponse {
+// データ型
+export interface PatternData {
+  id: string;
   pattern: string; // 256文字の図案データ
-  beads: Record<BeadColor, number>; // 色別使用数
+  beadCounts: BeadCounts;
 }
 
-interface BeadCounts {
-  [K in BeadColor]: number;
+export interface PatternApiResponse {
+  patterns: PatternData[];
+  success: boolean;
+  error?: string;
 }
+
+// 色名マッピング（表示用・API用・コード用）
+export const BEAD_COLOR_NAMES: Record<BeadColor, string>; // 日本語表示名
+export const BEAD_COLOR_EMOJIS: Record<BeadColor, string>; // 絵文字
+export const BEAD_COLOR_API_NAMES: Record<BeadColor, string>; // API用色名
+export const BEAD_COLOR_CODES: Record<BeadColor, string>; // 図案データ用1文字コード
 ```
 
 ## 📁 ディレクトリ構造
@@ -81,11 +113,28 @@ src/
 │   ├── page.tsx        # ホーム画面（メイン画面）
 │   ├── globals.css     # グローバルスタイル
 │   └── api/            # API Routes
+├── assets/             # 静的アセット（画像・アイコン）
+│   ├── background.png  # 背景画像
+│   ├── background2.png # 背景画像（代替）
+│   ├── camera.png      # カメラアイコン
+│   ├── home.png        # ホームアイコン 
+│   ├── next.png        # 次へアイコン
+│   ├── previous.png    # 戻るアイコン
+│   ├── reset.png       # リセットアイコン
+│   ├── step1.png       # ステップ1画像
+│   └── step2.png       # ステップ2画像
 ├── components/         # 再利用可能コンポーネント
-│   ├── common/         # 汎用コンポーネント
-│   ├── bead-input/     # ビーズ入力関連
-│   ├── pattern/        # 図案表示関連
-│   └── modal/          # モーダル関連
+│   ├── module/         # 複合コンポーネント
+│   │   ├── PatternDetailModal/  # 図案詳細モーダル
+│   │   ├── PatternGrid/         # 図案グリッド表示
+│   │   └── PatternPreview/      # 図案プレビュー
+│   ├── part/           # 基本コンポーネント
+│   │   ├── BeadInput/  # ビーズ入力コンポーネント
+│   │   ├── Button/     # ボタンコンポーネント
+│   │   └── Loading/    # ローディングコンポーネント
+│   └── template/       # ページテンプレート
+│       ├── bead-input/ # ビーズ入力画面
+│       └── pattern-view/ #図案選択画面
 ├── hooks/              # カスタムHooks
 ├── types/              # TypeScript型定義
 ├── utils/              # ユーティリティ関数
