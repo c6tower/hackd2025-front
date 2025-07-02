@@ -9,7 +9,11 @@ const BEAD_COLORS_ORDER: BeadColor[] = [
   'purple', 'black', 'white', 'pink', 'brown'
 ];
 
-export default function BeadInputScreen() {
+interface BeadInputScreenProps {
+  onSubmit?: (beadCounts: BeadCounts) => Promise<void> | void;
+}
+
+export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
   const [beadCounts, setBeadCounts] = useState<BeadCounts>(() => {
     const initialCounts = {} as BeadCounts;
     BEAD_COLORS_ORDER.forEach(color => {
@@ -33,11 +37,15 @@ export default function BeadInputScreen() {
     setBeadCounts(resetCounts);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    // TODO: 図案選択画面への遷移
-    console.log('ビーズ数:', beadCounts);
-    alert('図案を提案する機能は準備中です');
-  }, [beadCounts]);
+  const handleSubmit = useCallback(async () => {
+    if (onSubmit) {
+      await onSubmit(beadCounts);
+    } else {
+      // フォールバック処理（開発時）
+      console.log('ビーズ数:', beadCounts);
+      alert('図案を提案する機能は準備中です');
+    }
+  }, [beadCounts, onSubmit]);
 
   const hasAnyBeads = Object.values(beadCounts).some(count => count > 0);
 

@@ -111,3 +111,31 @@ export interface PatternApiResponse {
   success: boolean;
   error?: string;
 }
+
+// APIで使用する色名マッピング（design.mdの仕様に基づく）
+export const BEAD_COLOR_API_NAMES: Record<BeadColor, string> = {
+  red: 'red',
+  orange: 'orange',
+  yellow: 'yellow',
+  green: 'green',
+  blue: 'blue',
+  purple: 'violet', // APIでは"violet"を使用
+  black: 'dark',    // APIでは"dark"を使用
+  white: 'white',
+  pink: 'pink',
+  brown: 'maroon'   // APIでは"maroon"を使用
+} as const;
+
+// APIの色名からBeadColorへの逆マッピング
+export const API_NAME_TO_BEAD_COLOR: Record<string, BeadColor> = {
+  red: 'red',
+  orange: 'orange',
+  yellow: 'yellow',
+  green: 'green',
+  blue: 'blue',
+  violet: 'purple',
+  dark: 'black',
+  white: 'white',
+  pink: 'pink',
+  maroon: 'brown'
+} as const;
