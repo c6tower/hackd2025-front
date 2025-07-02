@@ -101,6 +101,22 @@ jest.mock('@/components/part/Button', () => ({
   )
 }));
 
+// ActionButtonのモック
+jest.mock('@/components/part/ActionButton', () => ({
+  __esModule: true,
+  default: ({ text, onClick }: {
+    text: string;
+    onClick: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      data-testid={`action-button-${text.toLowerCase()}`}
+    >
+      {text}
+    </button>
+  )
+}));
+
 // Loadingのモック
 jest.mock('@/components/part/Loading', () => ({
   __esModule: true,
@@ -182,14 +198,14 @@ describe('PatternViewScreen', () => {
     it('戻るボタンが表示される', () => {
       render(<PatternViewScreen {...mockProps} />);
       
-      expect(screen.getByText('Previous')).toBeInTheDocument();
+      expect(screen.getByTestId('action-button-previous')).toBeInTheDocument();
     });
 
     it('戻るボタンをクリックするとonBackが呼ばれる', () => {
       const mockOnBack = jest.fn();
       render(<PatternViewScreen {...mockProps} onBack={mockOnBack} />);
       
-      fireEvent.click(screen.getByText('Previous'));
+      fireEvent.click(screen.getByTestId('action-button-previous'));
       expect(mockOnBack).toHaveBeenCalledTimes(1);
     });
   });

@@ -18,6 +18,29 @@ jest.mock('../../part/BeadInput', () => {
   };
 });
 
+// ActionButtonコンポーネントをモック
+jest.mock('../../part/ActionButton', () => {
+  return function MockActionButton({ 
+    text, 
+    onClick, 
+    disabled 
+  }: { 
+    text: string; 
+    onClick: () => void; 
+    disabled?: boolean; 
+  }) {
+    return (
+      <button 
+        onClick={onClick} 
+        disabled={disabled}
+        data-testid={`action-button-${text.toLowerCase()}`}
+      >
+        {text}
+      </button>
+    );
+  };
+});
+
 describe('BeadInputScreen', () => {
   it('renders correctly with title and instructions', () => {
     render(<BeadInputScreen />);
@@ -50,8 +73,8 @@ describe('BeadInputScreen', () => {
   it('disables buttons when no beads are set', () => {
     render(<BeadInputScreen />);
     
-    const resetButton = screen.getByRole('button', { name: /Reset/i });
-    const submitButton = screen.getByRole('button', { name: /Next/i });
+    const resetButton = screen.getByTestId('action-button-reset');
+    const submitButton = screen.getByTestId('action-button-next');
     
     expect(resetButton).toBeDisabled();
     expect(submitButton).toBeDisabled();
@@ -71,8 +94,8 @@ describe('BeadInputScreen', () => {
     const incrementRedButton = screen.getByText('Increment red');
     await user.click(incrementRedButton);
     
-    const resetButton = screen.getByRole('button', { name: /Reset/i });
-    const submitButton = screen.getByRole('button', { name: /Next/i });
+    const resetButton = screen.getByTestId('action-button-reset');
+    const submitButton = screen.getByTestId('action-button-next');
     
     expect(resetButton).not.toBeDisabled();
     expect(submitButton).not.toBeDisabled();
@@ -105,7 +128,7 @@ describe('BeadInputScreen', () => {
     expect(screen.getByText('blue: 1')).toBeDefined();
     
     // リセットボタンをクリック
-    const resetButton = screen.getByRole('button', { name: /Reset/i });
+    const resetButton = screen.getByTestId('action-button-reset');
     await user.click(resetButton);
     
     // 全ての値が0にリセットされる
@@ -123,7 +146,7 @@ describe('BeadInputScreen', () => {
     await user.click(screen.getByText('Increment red'));
     
     // 提案ボタンをクリック
-    const submitButton = screen.getByRole('button', { name: /Next/i });
+    const submitButton = screen.getByTestId('action-button-next');
     await user.click(submitButton);
     
     expect(alertSpy).toHaveBeenCalledWith('図案を提案する機能は準備中です');

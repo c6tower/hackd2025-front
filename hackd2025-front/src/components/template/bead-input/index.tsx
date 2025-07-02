@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import Image from 'next/image';
 import { BeadColor, BeadCounts } from '@/types';
 import BeadInput from '@/components/part/BeadInput';
+import ActionButton from '@/components/part/ActionButton';
 import backgroundImage from '@/assets/background.png';
 import resetIcon from '@/assets/reset.png';
 import nextIcon from '@/assets/next.png';
@@ -105,27 +105,21 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
         {/* アクションボタン */}
         <div className="mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
-            <button
+            <ActionButton
+              icon={resetIcon}
+              text="Reset"
+              alt="リセット"
               onClick={handleReset}
               disabled={!hasAnyBeads}
-              className="flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-80 w-[180px] h-[180px] bg-white rounded-full shadow-lg"
-            >
-              <Image src={resetIcon} alt="リセット" width={120} height={120} />
-              <span className="text-gray-900 font-semibold text-xl">
-                Reset
-              </span>
-            </button>
+            />
             
-            <button
+            <ActionButton
+              icon={nextIcon}
+              text="Next"
+              alt="次へ"
               onClick={handleSubmit}
               disabled={!hasAnyBeads}
-              className="flex flex-col items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity hover:opacity-80 w-[180px] h-[180px] bg-white rounded-full shadow-lg"
-            >
-              <Image src={nextIcon} alt="次へ" width={120} height={120} />
-              <span className="text-gray-900 font-semibold text-xl">
-                Next
-              </span>
-            </button>
+            />
           </div>
 
           {/* ヘルプテキスト */}
