@@ -19,3 +19,33 @@
 - 紫: v
 - 茶色: m(maron)
 - null: n
+
+
+app dir 配下はそのままでOKです。
+components 配下は修正したいです。
+
+- components
+  - template
+    - bead-input
+      - index.tsx
+      - index.test.tsx
+    - pattern-view
+      - index.tsx
+      - index.test.tsx
+  - module
+    - PatternPreview
+      - index.tsx
+      - index.test.tsx
+    - PatternDetailModal
+      - index.tsx
+      - index.test.tsx
+    - PatternGrid
+      - index.tsx
+      - index.test.tsx
+  - part
+    - Button
+      - index.tsx
+      - index.test.tsx
+    - Loading
+      - index.tsx
+      - index.test.tsx

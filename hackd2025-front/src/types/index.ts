@@ -97,3 +97,17 @@ export const CODE_TO_BEAD_COLOR: Record<string, BeadColor> = {
   m: 'brown',
   n: 'white' // null -> white として扱う
 } as const;
+
+// 図案データの型
+export interface PatternData {
+  id: string;
+  pattern: string; // 256文字の図案データ
+  beadCounts: BeadCounts;
+}
+
+// API用の型
+export interface PatternApiResponse {
+  patterns: PatternData[];
+  success: boolean;
+  error?: string;
+}
