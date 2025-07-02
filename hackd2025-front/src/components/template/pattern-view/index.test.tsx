@@ -4,6 +4,14 @@ import '@testing-library/jest-dom';
 import { PatternViewScreen } from './index';
 import { BeadCounts } from '@/types/index';
 
+// 画像アセットのモック
+jest.mock('@/assets/background.png', () => ({
+  __esModule: true,
+  default: {
+    src: '/mock-background.png'
+  }
+}));
+
 // モック用のパターンデータ
 const mockPatternData = [
   {
@@ -137,14 +145,15 @@ describe('PatternViewScreen', () => {
     it('ヘッダーが正しく表示される', () => {
       render(<PatternViewScreen {...mockProps} />);
       
-      expect(screen.getByText('← 戻る')).toBeInTheDocument();
-      expect(screen.getByText('図案を選択')).toBeInTheDocument();
+      expect(screen.getByText('② Step')).toBeInTheDocument();
+      expect(screen.getByText('日')).toBeInTheDocument();
+      expect(screen.getByText('EN')).toBeInTheDocument();
     });
 
     it('説明文が表示される', () => {
       render(<PatternViewScreen {...mockProps} />);
       
-      expect(screen.getByText('あなたの手持ちビーズで作れる図案です')).toBeInTheDocument();
+      expect(screen.getByText('Pick one you like.')).toBeInTheDocument();
     });
 
     it('パターンプレビューが表示される', () => {
@@ -152,14 +161,6 @@ describe('PatternViewScreen', () => {
       
       expect(screen.getByTestId('pattern-preview-1')).toBeInTheDocument();
       expect(screen.getByTestId('pattern-preview-2')).toBeInTheDocument();
-    });
-
-    it('アクションボタンが表示される', () => {
-      render(<PatternViewScreen {...mockProps} />);
-      
-      expect(screen.getByText('詳細表示')).toBeInTheDocument();
-      expect(screen.getByTestId('← 戻る')).toBeInTheDocument(); // ヘッダー
-      expect(screen.getByTestId('戻る')).toBeInTheDocument(); // アクション部分
     });
   });
 
@@ -188,6 +189,15 @@ describe('PatternViewScreen', () => {
   });
 
   describe('パターン選択機能', () => {
+    it('パターンをクリックするとモーダルが開く', () => {
+      render(<PatternViewScreen {...mockProps} />);
+      
+      const pattern1 = screen.getByTestId('pattern-preview-1');
+      fireEvent.click(pattern1);
+      
+      expect(screen.getByTestId('pattern-detail-modal')).toBeInTheDocument();
+    });
+
     it('パターンをクリックすると選択状態になる', () => {
       render(<PatternViewScreen {...mockProps} />);
       
@@ -196,43 +206,14 @@ describe('PatternViewScreen', () => {
       
       expect(pattern1).toHaveAttribute('data-selected', 'true');
     });
-
-    it('詳細表示ボタンは最初は無効化されている', () => {
-      render(<PatternViewScreen {...mockProps} />);
-      
-      const detailButton = screen.getByText('詳細表示');
-      expect(detailButton).toBeDisabled();
-    });
-
-    it('パターンを選択すると詳細表示ボタンが有効化される', () => {
-      render(<PatternViewScreen {...mockProps} />);
-      
-      fireEvent.click(screen.getByTestId('pattern-preview-1'));
-      
-      const detailButton = screen.getByText('詳細表示');
-      expect(detailButton).not.toBeDisabled();
-    });
-
-    it('詳細表示ボタンをクリックするとモーダルが開く', () => {
-      render(<PatternViewScreen {...mockProps} />);
-      
-      // パターンを選択
-      fireEvent.click(screen.getByTestId('pattern-preview-1'));
-      
-      // 詳細表示ボタンをクリック
-      fireEvent.click(screen.getByText('詳細表示'));
-      
-      expect(screen.getByTestId('pattern-detail-modal')).toBeInTheDocument();
-    });
   });
 
   describe('モーダル操作', () => {
-    it('モーダルが正しく開く', () => {
+    it('パターンクリックでモーダルが正しく開く', () => {
       render(<PatternViewScreen {...mockProps} />);
       
-      // パターンを選択してモーダルを開く
+      // パターンをクリックしてモーダルを開く
       fireEvent.click(screen.getByTestId('pattern-preview-1'));
-      fireEvent.click(screen.getByText('詳細表示'));
       
       expect(screen.getByTestId('pattern-detail-modal')).toBeInTheDocument();
     });
@@ -240,9 +221,8 @@ describe('PatternViewScreen', () => {
     it('モーダルの閉じるボタンでモーダルが閉じる', () => {
       render(<PatternViewScreen {...mockProps} />);
       
-      // パターンを選択してモーダルを開く
+      // パターンをクリックしてモーダルを開く
       fireEvent.click(screen.getByTestId('pattern-preview-1'));
-      fireEvent.click(screen.getByText('詳細表示'));
       
       expect(screen.getByTestId('pattern-detail-modal')).toBeInTheDocument();
       
@@ -255,9 +235,8 @@ describe('PatternViewScreen', () => {
       const mockOnHome = jest.fn();
       render(<PatternViewScreen {...mockProps} onHome={mockOnHome} />);
       
-      // パターンを選択してモーダルを開く
+      // パターンをクリックしてモーダルを開く
       fireEvent.click(screen.getByTestId('pattern-preview-1'));
-      fireEvent.click(screen.getByText('詳細表示'));
       
       // モーダルのホームボタンをクリック
       fireEvent.click(screen.getByText('Home from Modal'));
@@ -267,21 +246,28 @@ describe('PatternViewScreen', () => {
   });
 
   describe('ナビゲーション', () => {
-    it('ヘッダーの戻るボタンでonBackが呼ばれる', () => {
-      const mockOnBack = jest.fn();
-      render(<PatternViewScreen {...mockProps} onBack={mockOnBack} />);
+    it('言語切り替えボタンが正しく表示される', () => {
+      render(<PatternViewScreen {...mockProps} />);
       
-      fireEvent.click(screen.getByText('← 戻る'));
-      expect(mockOnBack).toHaveBeenCalledTimes(1);
+      const japaneseButton = screen.getByText('日');
+      const englishButton = screen.getByText('EN');
+      
+      expect(japaneseButton).toBeInTheDocument();
+      expect(englishButton).toBeInTheDocument();
     });
 
-    it('アクション部分の戻るボタンでonBackが呼ばれる', () => {
-      const mockOnBack = jest.fn();
-      render(<PatternViewScreen {...mockProps} onBack={mockOnBack} />);
+    it('言語切り替えボタンがクリック可能である', () => {
+      render(<PatternViewScreen {...mockProps} />);
       
-      // アクション部分の戻るボタンをクリック
-      fireEvent.click(screen.getByTestId('戻る'));
-      expect(mockOnBack).toHaveBeenCalledTimes(1);
+      const japaneseButton = screen.getByText('日');
+      const englishButton = screen.getByText('EN');
+      
+      // クリックイベントが発生することを確認（エラーが出ないことを確認）
+      fireEvent.click(japaneseButton);
+      fireEvent.click(englishButton);
+      
+      expect(japaneseButton).toBeInTheDocument();
+      expect(englishButton).toBeInTheDocument();
     });
   });
 
