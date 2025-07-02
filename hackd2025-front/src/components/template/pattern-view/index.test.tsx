@@ -43,17 +43,16 @@ jest.mock('@/components/module/PatternPreview', () => ({
 
 // PatternDetailModalのモック
 jest.mock('@/components/module/PatternDetailModal', () => ({
-  PatternDetailModal: ({ isOpen, patternId, onClose, onHome }: {
+  PatternDetailModal: ({ isOpen, onClose, onHome }: {
     isOpen: boolean;
-    patternId: string;
     onClose: () => void;
     onHome: () => void;
   }) => 
     isOpen ? (
-      <div data-testid="pattern-detail-modal" data-pattern-id={patternId}>
+      <div data-testid="pattern-detail-modal">
         <button onClick={onClose}>Close Modal</button>
         <button onClick={onHome}>Home from Modal</button>
-        Pattern Detail Modal {patternId}
+        Pattern Detail Modal
       </div>
     ) : null
 }));

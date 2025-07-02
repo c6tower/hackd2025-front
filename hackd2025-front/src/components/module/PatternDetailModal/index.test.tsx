@@ -59,7 +59,6 @@ describe('PatternDetailModal', () => {
 
   const mockProps = {
     isOpen: true,
-    patternId: '1',
     pattern: 'w'.repeat(256),
     beadCounts: mockBeadCounts,
     onClose: jest.fn(),

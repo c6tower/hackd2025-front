@@ -173,7 +173,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
       {selectedPattern && (
         <PatternDetailModal
           isOpen={isModalOpen}
-          patternId={selectedPattern.id}
           pattern={selectedPattern.pattern}
           beadCounts={selectedPattern.beadCounts}
           onClose={handleModalClose}

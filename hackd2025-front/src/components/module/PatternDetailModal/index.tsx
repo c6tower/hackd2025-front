@@ -6,8 +6,6 @@ import { BeadCounts, BeadColor, BEAD_COLOR_NAMES, BEAD_COLOR_EMOJIS } from '@/ty
 interface PatternDetailModalProps {
   /** モーダルの表示状態 */
   isOpen: boolean;
-  /** 図案ID */
-  patternId: string;
   /** 256文字の図案データ */
   pattern: string;
   /** 必要なビーズ数 */
@@ -24,7 +22,6 @@ interface PatternDetailModalProps {
  */
 export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
   isOpen,
-  patternId,
   pattern,
   beadCounts,
   onClose,

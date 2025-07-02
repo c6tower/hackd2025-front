@@ -17,14 +17,16 @@ bun dev
 Or using Docker Compose:
 
 ```bash
-# For production environment
-docker-compose up web
+# For development environment with hot reload (recommended)
+docker-compose up dev --build
 
-# For development environment with hot reload
-docker-compose --profile dev up dev
+# For production environment
+docker-compose --profile prod up web --build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result (or [http://localhost:3001](http://localhost:3001) for development environment).
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+For external device access (e.g., mobile devices on the same WiFi network), use your machine's IP address: `http://[YOUR_IP_ADDRESS]:3000`
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
