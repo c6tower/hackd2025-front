@@ -40,7 +40,7 @@ export default function BeadInput({
     
     // 左右の余白をパーセンテージで設定（より小さく調整）
     // つまみが完全に左端/右端にあるときに背景が適切に表示されるように
-    const edgePadding = 1.5; // 左右それぞれ1.5%の余白に縮小
+    const edgePadding = 5; // 左右それぞれ5%の余白に縮小
     
     // 端の値での特別な処理
     if (value === min) return edgePadding;
@@ -129,7 +129,7 @@ export default function BeadInput({
           max={max}
           value={value}
           onChange={handleSliderChange}
-          className="w-full appearance-none cursor-pointer bead-slider h-5"
+          className="w-full appearance-none cursor-pointer bead-slider h-10"
           style={{
             background: `linear-gradient(to right, ${BEAD_COLORS[color]} 0%, ${BEAD_COLORS[color]} ${getBackgroundProgress()}%, #e5e7eb ${getBackgroundProgress()}%, #e5e7eb 100%)`,
             borderRadius: '9999px',
@@ -147,7 +147,7 @@ export default function BeadInput({
         onTouchStart={() => handleStepperMouseDown(-1)}
         onTouchEnd={handleStepperMouseUp}
         disabled={value <= min}
-        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm flex items-center justify-center transition-colors touch-manipulation"
+        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold text-2xl flex items-center justify-center transition-colors touch-manipulation"
         aria-label={`${BEAD_COLOR_NAMES[color]}を1個減らす`}
       >
         -
@@ -162,7 +162,7 @@ export default function BeadInput({
         onChange={handleInputChange}
         onBlur={handleInputBlur}
         onKeyDown={handleKeyDown}
-        className="w-12 sm:w-16 px-1 sm:px-2 py-1 text-center text-xs sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-12 sm:w-16 h-10 px-1 sm:px-2 text-center text-2xl bg-white text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         aria-label={`${BEAD_COLOR_NAMES[color]}の個数を直接入力`}
       />
 
@@ -174,14 +174,11 @@ export default function BeadInput({
         onTouchStart={() => handleStepperMouseDown(1)}
         onTouchEnd={handleStepperMouseUp}
         disabled={value >= max}
-        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm flex items-center justify-center transition-colors touch-manipulation"
+        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold text-2xl flex items-center justify-center transition-colors touch-manipulation"
         aria-label={`${BEAD_COLOR_NAMES[color]}を1個増やす`}
       >
         +
       </button>
-
-      {/* 個数表示 */}
-      <span className="text-xs sm:text-sm text-gray-600 w-6 sm:w-8">個</span>
     </div>
   );
 }
