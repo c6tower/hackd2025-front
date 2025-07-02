@@ -20,9 +20,15 @@ describe('BeadInput', () => {
 
     const numberInput = screen.getByLabelText('赤の個数を直接入力');
     expect(numberInput).toHaveValue(10);
-    expect(screen.getByText('赤')).toBeDefined();
-    expect(screen.getByText('🔴')).toBeDefined();
-    expect(screen.getByText('個')).toBeDefined();
+    
+    const slider = screen.getByLabelText('赤の個数を設定');
+    expect(slider).toHaveValue('10');
+    
+    const decrementButton = screen.getByLabelText('赤を1個減らす');
+    expect(decrementButton).toBeInTheDocument();
+    
+    const incrementButton = screen.getByLabelText('赤を1個増やす');
+    expect(incrementButton).toBeInTheDocument();
   });
 
   it('calls onChange when slider value changes', async () => {
@@ -169,8 +175,8 @@ describe('BeadInput', () => {
       />
     );
 
-    expect(screen.getByText('🔵')).toBeInTheDocument();
-    expect(screen.getByText('青')).toBeInTheDocument();
+    expect(screen.getByLabelText('青の個数を設定')).toBeInTheDocument();
+    expect(screen.getByLabelText('青の個数を直接入力')).toBeInTheDocument();
 
     rerender(
       <BeadInput
@@ -180,7 +186,7 @@ describe('BeadInput', () => {
       />
     );
 
-    expect(screen.getByText('🟢')).toBeInTheDocument();
-    expect(screen.getByText('緑')).toBeInTheDocument();
+    expect(screen.getByLabelText('緑の個数を設定')).toBeInTheDocument();
+    expect(screen.getByLabelText('緑の個数を直接入力')).toBeInTheDocument();
   });
 });

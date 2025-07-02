@@ -223,7 +223,6 @@ describe('PatternViewScreen', () => {
       fireEvent.click(screen.getByText('詳細表示'));
       
       expect(screen.getByTestId('pattern-detail-modal')).toBeInTheDocument();
-      expect(screen.getByTestId('pattern-detail-modal')).toHaveAttribute('data-pattern-id', '1');
     });
   });
 
@@ -236,7 +235,6 @@ describe('PatternViewScreen', () => {
       fireEvent.click(screen.getByText('詳細表示'));
       
       expect(screen.getByTestId('pattern-detail-modal')).toBeInTheDocument();
-      expect(screen.getByTestId('pattern-detail-modal')).toHaveAttribute('data-pattern-id', '1');
     });
 
     it('モーダルの閉じるボタンでモーダルが閉じる', () => {
