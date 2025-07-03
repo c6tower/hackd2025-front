@@ -82,19 +82,24 @@ export default function PhotoPage() {
       const formData = new FormData()
       formData.append('image', blob, 'photo.jpg')
 
-      const response = await fetch('http://localhost:8001/api/beadscount', {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001'
+      const response = await fetch(`${API_BASE_URL}/api/beadscount`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        }
       })
 
       if (!response.ok) {
-        throw new Error('API request failed')
+        const errorText = await response.text()
+        throw new Error(`API request failed: ${response.status} ${errorText}`)
       }
 
       const data: BeadCountResponse = await response.json()
       setBeadCounts(data)
     } catch (err) {
-      setError('画像の処理中にエラーが発生しました')
+      setError('画像の処理中にエラーが発生しました。カメラ機能やAPIサーバーが正常に動作していることを確認してください。')
       console.error('API error:', err)
     } finally {
       setIsLoading(false)

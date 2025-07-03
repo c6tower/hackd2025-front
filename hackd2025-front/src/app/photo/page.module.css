@@ -9,11 +9,21 @@
 .startSection,
 .cameraSection {
   background-color: #000;
+  min-height: 100vh;
+  position: relative;
 }
 
 .startSection,
 .previewSection,
 .resultSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+.cameraSection {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -47,6 +57,7 @@
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1;
 }
 
 .video {
@@ -79,13 +90,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   background: white;
   border: none;
-  border-radius: 50px;
-  padding: 1rem 1.5rem;
+  border-radius: 25px;
+  padding: 0.5rem 0.75rem;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
   color: #333;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -216,8 +227,9 @@
   }
 
   .homeButton {
-    padding: 0.75rem 1.25rem;
-    font-size: 14px;
+    padding: 0.5rem 0.75rem;
+    font-size: 11px;
+    border-radius: 20px;
   }
   
   .homeButton img {
