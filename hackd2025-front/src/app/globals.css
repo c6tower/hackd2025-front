@@ -26,6 +26,13 @@ body {
 }
 
 @layer components {
+  /* 共通レイアウトクラス */
+  .app-container {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
   .bead-slider {
     --track-height: 40px;
     padding: 0;

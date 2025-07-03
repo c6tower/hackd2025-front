@@ -60,11 +60,11 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
         backgroundImage: `url(${backgroundImage.src})`
       }}
     >
-      <div className="max-w-2xl mx-auto pt-8 pb-8 px-4">
+      <div className="app-container">
         {/* ステップタイトル */}
-        <div className="text-center mb-6">
+        <header className="text-center">
           {/* タイトルと言語切り替えボタンの横並び */}
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center">
             <h1 className="inline-block text-white font-bold rounded-full relative text-3xl px-8 py-4 bg-purple-400">
               ① Start !
               <span className="absolute top-1/2 -translate-y-1/2 left-full -ml-1 w-0 h-0 border-t-[16px] border-b-[16px] border-l-[20px] border-transparent border-l-purple-400" />
@@ -81,54 +81,57 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
             </div>
           </div>
           
-          <div className="inline-block text-gray-900 font-bold rounded-full text-2xl px-6 py-3 bg-white">
+          <div className="inline-block text-gray-900 font-bold rounded-full text-2xl px-6 py-3 bg-white mt-4 sm:mt-6">
             Slide to choose how many colors you like.
           </div>
-        </div>
+        </header>
 
-        {/* ビーズ入力フォーム */}
-        <div className="mb-4 sm:mb-6">
-          <div className="space-y-1">
-            {BEAD_COLORS_ORDER.map(color => (
-              <BeadInput
-                key={color}
-                color={color}
-                value={beadCounts[color]}
-                onChange={(value) => handleBeadCountChange(color, value)}
-                min={0}
-                max={256}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* アクションボタン */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
-            <ActionButton
-              icon={resetIcon}
-              text="Reset"
-              alt="リセット"
-              onClick={handleReset}
-              disabled={!hasAnyBeads}
-            />
-            
-            <ActionButton
-              icon={nextIcon}
-              text="Next"
-              alt="次へ"
-              onClick={handleSubmit}
-              disabled={!hasAnyBeads}
-            />
-          </div>
-
-          {/* ヘルプテキスト */}
-          {!hasAnyBeads && (
-            <div className="mt-6 text-center text-gray-500 text-xs sm:text-sm">
-              ビーズ数を1個以上設定してください
+        {/* メインコンテンツ */}
+        <main>
+          {/* ビーズ入力フォーム */}
+          <div className="mt-4 sm:mt-6">
+            <div className="space-y-1">
+              {BEAD_COLORS_ORDER.map(color => (
+                <BeadInput
+                  key={color}
+                  color={color}
+                  value={beadCounts[color]}
+                  onChange={(value) => handleBeadCountChange(color, value)}
+                  min={0}
+                  max={256}
+                />
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+
+          {/* アクションボタン */}
+          <div className="mt-4 sm:mt-6">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
+              <ActionButton
+                icon={resetIcon}
+                text="Reset"
+                alt="リセット"
+                onClick={handleReset}
+                disabled={!hasAnyBeads}
+              />
+              
+              <ActionButton
+                icon={nextIcon}
+                text="Next"
+                alt="次へ"
+                onClick={handleSubmit}
+                disabled={!hasAnyBeads}
+              />
+            </div>
+
+            {/* ヘルプテキスト */}
+            {!hasAnyBeads && (
+              <div className="mt-6 text-center text-gray-500 text-xs sm:text-sm">
+                ビーズ数を1個以上設定してください
+              </div>
+            )}
+          </div>
+        </main>
       </div>
     </div>
   );
