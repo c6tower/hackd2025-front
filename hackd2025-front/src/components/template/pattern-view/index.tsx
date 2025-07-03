@@ -2,15 +2,9 @@ import React from 'react';
 import { PatternPreview } from '@/components/module/PatternPreview';
 import { PatternDetailModal } from '@/components/module/PatternDetailModal';
 import ActionButton from '@/components/part/ActionButton';
-import { BeadCounts } from '@/types/index';
+import { PatternData } from '@/types/index';
 import backgroundImage from '@/assets/background2.png';
 import previousIcon from '@/assets/previous.png';
-
-interface PatternData {
-  id: string;
-  pattern: string;
-  beadCounts: BeadCounts;
-}
 
 interface PatternViewScreenProps {
   /** 図案データのリスト */
@@ -82,6 +76,7 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
                 key={pattern.id}
                 id={pattern.id}
                 pattern={pattern.pattern}
+                title={pattern.title}
                 selected={selectedPatternId === pattern.id}
                 onSelect={handlePatternSelect}
               />
@@ -104,6 +99,7 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
           <PatternDetailModal
             isOpen={isModalOpen}
             pattern={selectedPattern.pattern}
+            title={selectedPattern.title}
             beadCounts={selectedPattern.beadCounts}
             onClose={handleModalClose}
           />

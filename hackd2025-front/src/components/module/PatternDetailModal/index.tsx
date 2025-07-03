@@ -8,6 +8,8 @@ interface PatternDetailModalProps {
   isOpen: boolean;
   /** 256文字の図案データ */
   pattern: string;
+  /** 図案のタイトル */
+  title?: string;
   /** 必要なビーズ数 */
   beadCounts: BeadCounts;
   /** 閉じるボタンのコールバック */
@@ -21,6 +23,7 @@ interface PatternDetailModalProps {
 export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
   isOpen,
   pattern,
+  title,
   beadCounts,
   onClose
 }) => {
@@ -127,6 +130,15 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
 
         {/* コンテンツ */}
         <div className="p-6">
+          {/* タイトル */}
+          {title && (
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {title}
+              </h2>
+            </div>
+          )}
+          
           {/* 図案グリッド */}
           <div className="flex justify-center mb-6">
             <PatternGrid

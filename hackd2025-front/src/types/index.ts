@@ -125,6 +125,7 @@ export interface PatternData {
   id: string;
   pattern: string; // 256文字の図案データ
   beadCounts: BeadCounts;
+  title?: string; // 図案のタイトル
 }
 
 // API用の型
