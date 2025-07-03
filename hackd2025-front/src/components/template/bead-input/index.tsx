@@ -213,7 +213,7 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
 
           <div className="mt-4 sm:mt-6">
             {/* アクションボタン */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-4">
               <ActionButton
                 icon={cameraIcon}
                 text="Camera"

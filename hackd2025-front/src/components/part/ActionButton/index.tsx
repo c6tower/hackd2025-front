@@ -33,7 +33,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        flex flex-col items-center justify-center gap-2 
+        flex flex-col items-center justify-center 
         disabled:opacity-50 disabled:cursor-not-allowed 
         transition-opacity hover:opacity-80 
         w-[180px] h-[180px] bg-white rounded-full shadow-lg
