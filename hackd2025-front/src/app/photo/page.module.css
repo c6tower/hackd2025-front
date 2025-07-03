@@ -197,22 +197,18 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
   transition: all 0.2s;
-  position: absolute;
-  right: 2rem;
-  transform: translateY(-50%);
-  top: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .fileButton:hover {
-  transform: translateY(-50%) scale(1.1);
+  transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(0, 122, 255, 0.5);
 }
 
 .fileButton:active {
-  transform: translateY(-50%) scale(0.95);
+  transform: scale(0.95);
 }
 
 .resultTitle {
