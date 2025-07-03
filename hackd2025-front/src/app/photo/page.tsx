@@ -246,6 +246,19 @@ export default function PhotoPage() {
     }
   }
 
+  const goToBeadInput = () => {
+    try {
+      if (beadCounts) {
+        // ビーズカウントデータをセッションストレージに保存
+        const dataToSave = JSON.stringify(beadCounts);
+        sessionStorage.setItem('beadCounts', dataToSave);
+      }
+      router.push('/')
+    } catch {
+      router.push('/')
+    }
+  }
+
   return (
     <div className={styles.container}>
       {isCapturing && (
@@ -355,6 +368,9 @@ export default function PhotoPage() {
             </button>
             <button onClick={retakePhoto} className={styles.captureButton}>
               撮り直す
+            </button>
+            <button onClick={goToBeadInput} className={styles.decisionButton}>
+              決定
             </button>
           </div>
         </div>

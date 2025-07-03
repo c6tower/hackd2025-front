@@ -104,6 +104,11 @@ export default function BeadInput({
     }
   }, []);
 
+  // valueが外部から変更された場合にinputValueを同期
+  useEffect(() => {
+    setInputValue(value.toString());
+  }, [value]);
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
