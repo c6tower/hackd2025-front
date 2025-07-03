@@ -23,11 +23,26 @@ interface BeadInputScreenProps {
   loading?: boolean;
   /** エラーメッセージ */
   error?: string;
+  /** 初期のビーズ数（親コンポーネントから状態を受け取る） */
+  initialBeadCounts?: BeadCounts;
+  /** ビーズ数変更時のコールバック */
+  onBeadCountsChange?: (beadCounts: BeadCounts) => void;
 }
 
-export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputScreenProps) {
+export default function BeadInputScreen({ 
+  onSubmit, 
+  loading, 
+  error, 
+  initialBeadCounts,
+  onBeadCountsChange 
+}: BeadInputScreenProps) {
   const router = useRouter();
   const [beadCounts, setBeadCounts] = useState<BeadCounts>(() => {
+    // 初期値が渡されている場合はそれを使用
+    if (initialBeadCounts) {
+      return initialBeadCounts;
+    }
+    
     const initialCounts = {} as BeadCounts;
     BEAD_COLORS_ORDER.forEach(color => {
       initialCounts[color] = 0;
@@ -35,7 +50,14 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
     return initialCounts;
   });
 
-  // sessionStorageからデータを読み込む
+  // initialBeadCountsが変更されたら状態を更新
+  useEffect(() => {
+    if (initialBeadCounts) {
+      setBeadCounts(initialBeadCounts);
+    }
+  }, [initialBeadCounts]);
+
+  // sessionStorageからデータを読み込む（カメラ機能用）
   useEffect(() => {
     const storedData = sessionStorage.getItem('beadCounts');
     if (storedData) {
@@ -122,6 +144,12 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
           });
           
           setBeadCounts(mappedCounts);
+          
+          // 親コンポーネントに変更を通知
+          if (onBeadCountsChange) {
+            onBeadCountsChange(mappedCounts);
+          }
+          
           // データを使用したら削除
           sessionStorage.removeItem('beadCounts');
         }
@@ -129,14 +157,20 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
         console.error('Failed to parse stored bead counts:', error);
       }
     }
-  }, []);
+  }, [onBeadCountsChange]);
 
   const handleBeadCountChange = useCallback((color: BeadColor, value: number) => {
-    setBeadCounts(prev => ({
-      ...prev,
+    const newBeadCounts = {
+      ...beadCounts,
       [color]: value
-    }));
-  }, []);
+    };
+    setBeadCounts(newBeadCounts);
+    
+    // 親コンポーネントに変更を通知
+    if (onBeadCountsChange) {
+      onBeadCountsChange(newBeadCounts);
+    }
+  }, [beadCounts, onBeadCountsChange]);
 
   const handleReset = useCallback(() => {
     const resetCounts = {} as BeadCounts;
@@ -144,7 +178,12 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
       resetCounts[color] = 0;
     });
     setBeadCounts(resetCounts);
-  }, []);
+    
+    // 親コンポーネントに変更を通知
+    if (onBeadCountsChange) {
+      onBeadCountsChange(resetCounts);
+    }
+  }, [onBeadCountsChange]);
 
   const handleCamera = useCallback(() => {
     router.push('/photo');
