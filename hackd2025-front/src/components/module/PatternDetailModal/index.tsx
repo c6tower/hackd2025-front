@@ -27,6 +27,19 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
   beadCounts,
   onClose
 }) => {
+  // デバッグ情報: モーダルのプロパティを確認
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('PatternDetailModal opened with:', {
+        title,
+        titleType: typeof title,
+        titleLength: title?.length,
+        hasTitle: !!title,
+        pattern: pattern ? `${pattern.length} chars` : 'no pattern'
+      });
+    }
+  }, [isOpen, title, pattern]);
+
   // モーダルのフォーカストラップ用
   const modalRef = React.useRef<HTMLDivElement>(null);
   const firstFocusableRef = React.useRef<HTMLButtonElement>(null);

@@ -100,10 +100,34 @@ export const fetchSuggestions = async (beadCounts: BeadCounts): Promise<PatternD
 
     const data: ApiPatternResponse[] = await response.json();
     
+    // デバッグ情報: APIレスポンスを確認
+    console.log('API Response data:', data);
+    data.forEach((item, index) => {
+      console.log(`API Response item ${index}:`, {
+        pattern: item.pattern ? `${item.pattern.length} chars` : 'no pattern',
+        title: item.title,
+        beadsKeys: Object.keys(item.beads),
+        beadsValues: Object.values(item.beads)
+      });
+    });
+    
     // リクエストIDを生成（タイムスタンプベース）
     const requestId = Date.now().toString();
     
-    return convertApiResponseToPatternData(data, requestId);
+    const convertedData = convertApiResponseToPatternData(data, requestId);
+    
+    // デバッグ情報: 変換後のデータを確認
+    console.log('Converted pattern data:', convertedData);
+    convertedData.forEach((item, index) => {
+      console.log(`Converted item ${index}:`, {
+        id: item.id,
+        title: item.title,
+        pattern: item.pattern ? `${item.pattern.length} chars` : 'no pattern',
+        beadCountsTotal: Object.values(item.beadCounts).reduce((sum, count) => sum + count, 0)
+      });
+    });
+    
+    return convertedData;
   } catch (error) {
     console.error('API呼び出しエラー:', error);
     throw error;

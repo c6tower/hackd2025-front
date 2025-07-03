@@ -27,6 +27,24 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
 
   const selectedPattern = patterns.find(p => p.id === selectedPatternId);
 
+  // デバッグ情報を出力
+  React.useEffect(() => {
+    console.log('PatternViewScreen - patterns:', patterns);
+    patterns.forEach((pattern, index) => {
+      console.log(`Pattern ${index}:`, {
+        id: pattern.id,
+        title: pattern.title,
+        hasPattern: !!pattern.pattern,
+        beadCountsKeys: Object.keys(pattern.beadCounts)
+      });
+    });
+  }, [patterns]);
+
+  React.useEffect(() => {
+    console.log('Selected pattern:', selectedPattern);
+    console.log('Selected pattern title:', selectedPattern?.title);
+  }, [selectedPattern]);
+
   const handlePatternSelect = (id: string) => {
     setSelectedPatternId(id);
     setIsModalOpen(true);

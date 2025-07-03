@@ -25,6 +25,17 @@ export const PatternPreview: React.FC<PatternPreviewProps> = ({
   selected,
   onSelect
 }) => {
+  // デバッグ情報: プロパティを確認
+  React.useEffect(() => {
+    console.log(`PatternPreview ${id}:`, {
+      id,
+      title,
+      titleType: typeof title,
+      titleLength: title?.length,
+      hasTitle: !!title
+    });
+  }, [id, title]);
+
   const handleClick = () => {
     onSelect(id);
   };
