@@ -42,10 +42,11 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
             mappedCounts[color] = 0;
           });
           
-          // APIの色名と既存の色名の対応
+          // APIの色名と既存の色名の対応（より包括的なマッピング）
           const colorMapping: { [key: string]: BeadColor } = {
+            // 基本的な色名
             'red': 'red',
-            'orange': 'orange',
+            'orange': 'orange', 
             'yellow': 'yellow',
             'green': 'green',
             'blue': 'blue',
@@ -54,14 +55,63 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
             'white': 'white',
             'pink': 'pink',
             'brown': 'brown',
-            'maron': 'brown', // maronをbrownにマッピング
-            'dark': 'black'   // darkをblackにマッピング
+            
+            // APIで返される可能性のある色名のバリエーション
+            'maron': 'brown',     // maronをbrownにマッピング
+            'maroon': 'brown',    // maroonをbrownにマッピング
+            'dark': 'black',      // darkをblackにマッピング
+            'light': 'white',     // lightをwhiteにマッピング
+            'gray': 'black',      // grayをblackにマッピング
+            'grey': 'black',      // greyをblackにマッピング
+            'violet': 'purple',   // violetをpurpleにマッピング
+            'lime': 'green',      // limeをgreenにマッピング
+            'navy': 'blue',       // navyをblueにマッピング
+            'beige': 'white',     // beigeをwhiteにマッピング
+            'cream': 'white',     // creamをwhiteにマッピング
+            'crimson': 'red',     // crimsonをredにマッピング
+            'scarlet': 'red',     // scarletをredにマッピング
+            'rose': 'pink',       // roseをpinkにマッピング
+            'magenta': 'pink',    // magentaをpinkにマッピング
+            'cyan': 'blue',       // cyanをblueにマッピング
+            'gold': 'yellow',     // goldをyellowにマッピング
+            'silver': 'white'     // silverをwhiteにマッピング
           };
           
           Object.entries(parsedData.beads).forEach(([apiColor, count]) => {
-            const mappedColor = colorMapping[apiColor];
+            // 色名を小文字に統一してマッピング
+            const normalizedApiColor = apiColor.toLowerCase().trim();
+            const mappedColor = colorMapping[normalizedApiColor];
+            
             if (mappedColor && mappedColor in mappedCounts) {
               mappedCounts[mappedColor] += count as number;
+              console.log(`色マッピング成功: ${apiColor} (${normalizedApiColor}) -> ${mappedColor} (${count}個)`);
+            } else {
+              console.warn(`未対応の色名: ${apiColor} (${normalizedApiColor}) - ${count}個`);
+              // 未対応の色は最も近い色に自動マッピング（簡易実装）
+              if (normalizedApiColor.includes('red') || normalizedApiColor.includes('赤')) {
+                mappedCounts['red'] += count as number;
+              } else if (normalizedApiColor.includes('blue') || normalizedApiColor.includes('青')) {
+                mappedCounts['blue'] += count as number;
+              } else if (normalizedApiColor.includes('green') || normalizedApiColor.includes('緑')) {
+                mappedCounts['green'] += count as number;
+              } else if (normalizedApiColor.includes('yellow') || normalizedApiColor.includes('黄')) {
+                mappedCounts['yellow'] += count as number;
+              } else if (normalizedApiColor.includes('purple') || normalizedApiColor.includes('紫')) {
+                mappedCounts['purple'] += count as number;
+              } else if (normalizedApiColor.includes('pink') || normalizedApiColor.includes('ピンク')) {
+                mappedCounts['pink'] += count as number;
+              } else if (normalizedApiColor.includes('brown') || normalizedApiColor.includes('茶')) {
+                mappedCounts['brown'] += count as number;
+              } else if (normalizedApiColor.includes('white') || normalizedApiColor.includes('白')) {
+                mappedCounts['white'] += count as number;
+              } else if (normalizedApiColor.includes('black') || normalizedApiColor.includes('黒')) {
+                mappedCounts['black'] += count as number;
+              } else {
+                // どれにも該当しない場合は最初に見つかった0でない色に追加
+                const firstNonZeroColor = BEAD_COLORS_ORDER.find(color => mappedCounts[color] > 0) || 'red';
+                mappedCounts[firstNonZeroColor] += count as number;
+                console.log(`フォールバック: ${apiColor} -> ${firstNonZeroColor}`);
+              }
             }
           });
           

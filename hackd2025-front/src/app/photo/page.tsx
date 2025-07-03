@@ -258,9 +258,14 @@ export default function PhotoPage() {
       }
 
       const data: BeadCountResponse = await response.json()
+      console.log('APIから受信したビーズデータ:', data)
+      console.log('ビーズの色と個数:', data.beads)
       setBeadCounts(data)
+      setDebugInfo(`解析完了: ${Object.keys(data.beads).length}色のビーズを検出`)
     } catch (err) {
-      setError('画像の処理中にエラーが発生しました。カメラ機能やAPIサーバーが正常に動作していることを確認してください。')
+      const errorMessage = '画像の処理中にエラーが発生しました。カメラ機能やAPIサーバーが正常に動作していることを確認してください。'
+      setError(errorMessage)
+      setDebugInfo(`APIエラー: ${err instanceof Error ? err.message : String(err)}`)
       console.error('API error:', err)
     } finally {
       setIsLoading(false)
@@ -293,7 +298,14 @@ export default function PhotoPage() {
   const goToHome = () => {
     if (beadCounts) {
       // ビーズカウントデータをセッションストレージに保存
-      sessionStorage.setItem('beadCounts', JSON.stringify(beadCounts))
+      const dataToSave = JSON.stringify(beadCounts);
+      sessionStorage.setItem('beadCounts', dataToSave);
+      console.log('ビーズデータをsessionStorageに保存しました:', beadCounts);
+      console.log('保存されたデータ:', dataToSave);
+      setDebugInfo('ビーズデータを保存してホームに移動中...');
+    } else {
+      console.log('保存するビーズデータがありません');
+      setDebugInfo('ビーズデータなしでホームに移動中...');
     }
     router.push('/')
   }
