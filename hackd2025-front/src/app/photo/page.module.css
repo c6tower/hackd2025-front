@@ -1,0 +1,294 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #e8e8e8;
+  position: relative;
+}
+
+.startSection,
+.cameraSection {
+  background-color: #000;
+  min-height: 100vh;
+  position: relative;
+}
+
+.startSection,
+.previewSection,
+.resultSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+.cameraSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+.cameraIconContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.cameraIcon {
+  width: 120px;
+  height: 120px;
+  color: #666;
+}
+
+.videoContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  height: 90vw;
+  max-width: 600px;
+  max-height: 600px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #000;
+  display: block;
+}
+
+.preview,
+.resultImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex: 1;
+}
+
+.bottomControls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+
+.homeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
+}
+
+.homeButton:hover {
+  transform: scale(1.05);
+}
+
+.homeButton img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.homeButton svg {
+  width: 40px;
+  height: 40px;
+}
+
+.captureButton {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #ff3b30;
+  color: white;
+  border: 4px solid white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
+  transition: all 0.2s;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.captureButton:hover {
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(255, 59, 48, 0.5);
+}
+
+.captureButton:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.captureButton:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.fileButton {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #007aff;
+  color: white;
+  border: 4px solid white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+  transition: all 0.2s;
+  position: absolute;
+  right: 2rem;
+  transform: translateY(-50%);
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fileButton:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.5);
+}
+
+.fileButton:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.resultTitle {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.beadCounts {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+}
+
+.beadItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.beadItem:last-child {
+  border-bottom: none;
+}
+
+.colorName {
+  font-weight: 500;
+  color: #333;
+  font-size: 16px;
+}
+
+.count {
+  font-weight: bold;
+  color: #ff3b30;
+  font-size: 18px;
+}
+
+.error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .cameraIcon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .bottomControls {
+    padding: 1.5rem;
+  }
+
+  .captureButton {
+    width: 70px;
+    height: 70px;
+    font-size: 14px;
+  }
+
+  .homeButton {
+    width: 70px;
+    height: 70px;
+    font-size: 11px;
+    gap: 0.05rem;
+  }
+  
+  .homeButton img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .homeButton svg {
+    width: 35px;
+    height: 35px;
+  }
+
+  .fileButton {
+    width: 70px;
+    height: 70px;
+    right: 1.5rem;
+  }
+
+  .fileButton svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .beadCounts {
+    min-width: 250px;
+    padding: 1.5rem;
+  }
+}

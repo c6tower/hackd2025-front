@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { BeadColor, BeadCounts } from '@/types';
 import BeadInput from '@/components/part/BeadInput';
 import ActionButton from '@/components/part/ActionButton';
@@ -9,6 +10,7 @@ import Loading from '@/components/part/Loading';
 import backgroundImage from '@/assets/background.png';
 import resetIcon from '@/assets/reset.png';
 import nextIcon from '@/assets/next.png';
+import cameraIcon from '@/assets/camera.png';
 
 const BEAD_COLORS_ORDER: BeadColor[] = [
   'red', 'orange', 'yellow', 'green', 'blue', 
@@ -24,6 +26,7 @@ interface BeadInputScreenProps {
 }
 
 export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputScreenProps) {
+  const router = useRouter();
   const [beadCounts, setBeadCounts] = useState<BeadCounts>(() => {
     const initialCounts = {} as BeadCounts;
     BEAD_COLORS_ORDER.forEach(color => {
@@ -31,6 +34,102 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
     });
     return initialCounts;
   });
+
+  // sessionStorageからデータを読み込む
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('beadCounts');
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData && parsedData.beads) {
+          // APIレスポンスの色名を既存の色名にマッピング
+          const mappedCounts = {} as BeadCounts;
+          BEAD_COLORS_ORDER.forEach(color => {
+            mappedCounts[color] = 0;
+          });
+          
+          // APIの色名と既存の色名の対応（より包括的なマッピング）
+          const colorMapping: { [key: string]: BeadColor } = {
+            // 基本的な色名
+            'red': 'red',
+            'orange': 'orange', 
+            'yellow': 'yellow',
+            'green': 'green',
+            'blue': 'blue',
+            'purple': 'purple',
+            'black': 'black',
+            'white': 'white',
+            'pink': 'pink',
+            'brown': 'brown',
+            
+            // APIで返される可能性のある色名のバリエーション
+            'maron': 'brown',     // maronをbrownにマッピング
+            'maroon': 'brown',    // maroonをbrownにマッピング
+            'dark': 'black',      // darkをblackにマッピング
+            'light': 'white',     // lightをwhiteにマッピング
+            'gray': 'black',      // grayをblackにマッピング
+            'grey': 'black',      // greyをblackにマッピング
+            'violet': 'purple',   // violetをpurpleにマッピング
+            'lime': 'green',      // limeをgreenにマッピング
+            'navy': 'blue',       // navyをblueにマッピング
+            'beige': 'white',     // beigeをwhiteにマッピング
+            'cream': 'white',     // creamをwhiteにマッピング
+            'crimson': 'red',     // crimsonをredにマッピング
+            'scarlet': 'red',     // scarletをredにマッピング
+            'rose': 'pink',       // roseをpinkにマッピング
+            'magenta': 'pink',    // magentaをpinkにマッピング
+            'cyan': 'blue',       // cyanをblueにマッピング
+            'gold': 'yellow',     // goldをyellowにマッピング
+            'silver': 'white'     // silverをwhiteにマッピング
+          };
+          
+          Object.entries(parsedData.beads).forEach(([apiColor, count]) => {
+            // 色名を小文字に統一してマッピング
+            const normalizedApiColor = apiColor.toLowerCase().trim();
+            const mappedColor = colorMapping[normalizedApiColor];
+            
+            if (mappedColor && mappedColor in mappedCounts) {
+              mappedCounts[mappedColor] += count as number;
+              console.log(`色マッピング成功: ${apiColor} (${normalizedApiColor}) -> ${mappedColor} (${count}個)`);
+            } else {
+              console.warn(`未対応の色名: ${apiColor} (${normalizedApiColor}) - ${count}個`);
+              // 未対応の色は最も近い色に自動マッピング（簡易実装）
+              if (normalizedApiColor.includes('red') || normalizedApiColor.includes('赤')) {
+                mappedCounts['red'] += count as number;
+              } else if (normalizedApiColor.includes('blue') || normalizedApiColor.includes('青')) {
+                mappedCounts['blue'] += count as number;
+              } else if (normalizedApiColor.includes('green') || normalizedApiColor.includes('緑')) {
+                mappedCounts['green'] += count as number;
+              } else if (normalizedApiColor.includes('yellow') || normalizedApiColor.includes('黄')) {
+                mappedCounts['yellow'] += count as number;
+              } else if (normalizedApiColor.includes('purple') || normalizedApiColor.includes('紫')) {
+                mappedCounts['purple'] += count as number;
+              } else if (normalizedApiColor.includes('pink') || normalizedApiColor.includes('ピンク')) {
+                mappedCounts['pink'] += count as number;
+              } else if (normalizedApiColor.includes('brown') || normalizedApiColor.includes('茶')) {
+                mappedCounts['brown'] += count as number;
+              } else if (normalizedApiColor.includes('white') || normalizedApiColor.includes('白')) {
+                mappedCounts['white'] += count as number;
+              } else if (normalizedApiColor.includes('black') || normalizedApiColor.includes('黒')) {
+                mappedCounts['black'] += count as number;
+              } else {
+                // どれにも該当しない場合は最初に見つかった0でない色に追加
+                const firstNonZeroColor = BEAD_COLORS_ORDER.find(color => mappedCounts[color] > 0) || 'red';
+                mappedCounts[firstNonZeroColor] += count as number;
+                console.log(`フォールバック: ${apiColor} -> ${firstNonZeroColor}`);
+              }
+            }
+          });
+          
+          setBeadCounts(mappedCounts);
+          // データを使用したら削除
+          sessionStorage.removeItem('beadCounts');
+        }
+      } catch (error) {
+        console.error('Failed to parse stored bead counts:', error);
+      }
+    }
+  }, []);
 
   const handleBeadCountChange = useCallback((color: BeadColor, value: number) => {
     setBeadCounts(prev => ({
@@ -46,6 +145,10 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
     });
     setBeadCounts(resetCounts);
   }, []);
+
+  const handleCamera = useCallback(() => {
+    router.push('/photo');
+  }, [router]);
 
   const handleSubmit = useCallback(async () => {
     if (onSubmit) {
@@ -111,6 +214,14 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
           <div className="mt-4 sm:mt-6">
             {/* アクションボタン */}
             <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
+              <ActionButton
+                icon={cameraIcon}
+                text="Camera"
+                alt="カメラ"
+                onClick={handleCamera}
+                disabled={false}
+              />
+
               <ActionButton
                 icon={resetIcon}
                 text="Reset"
