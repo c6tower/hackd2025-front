@@ -79,13 +79,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   background: white;
   border: none;
-  border-radius: 60px;
-  padding: 2.5rem 3rem;
+  border-radius: 50px;
+  padding: 1rem 1.5rem;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   color: #333;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -216,8 +216,8 @@
   }
 
   .homeButton {
-    padding: 2rem 2.5rem;
-    font-size: 18px;
+    padding: 0.75rem 1.25rem;
+    font-size: 14px;
   }
   
   .homeButton img {
