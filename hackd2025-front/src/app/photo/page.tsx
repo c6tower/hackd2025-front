@@ -33,68 +33,96 @@ export default function PhotoPage() {
         throw new Error('お使いのブラウザはカメラ機能をサポートしていません')
       }
       
-      // まずカメラのアクセス権限を確認
-      const constraints = { 
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        } 
+      // 最も基本的な制約で開始（成功率を上げるため）
+      let constraints = { 
+        video: true
       }
+
+      setDebugInfo('基本的なカメラアクセスをテスト中...')
+      console.log('基本的なカメラアクセスをテスト中...', constraints)
       
-      setDebugInfo('カメラアクセス権限を確認中...')
-      console.log('カメラストリーム取得中...', constraints)
+      // まず基本的な設定でテスト
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
       console.log('カメラストリーム取得成功:', stream)
-      setDebugInfo('カメラストリーム取得成功')
+      
+      // ストリームの詳細情報をログ出力
+      const tracks = stream.getVideoTracks()
+      if (tracks.length > 0) {
+        const track = tracks[0]
+        const settings = track.getSettings()
+        console.log('ビデオトラック設定:', settings)
+        setDebugInfo(`カメラストリーム取得成功 - ${settings.width}x${settings.height}`)
+      } else {
+        console.warn('ビデオトラックが見つかりません')
+        setDebugInfo('ビデオトラックが見つかりません')
+      }
       
       if (videoRef.current) {
         setDebugInfo('ビデオ要素にストリームを設定中...')
         console.log('ビデオ要素にストリームを設定中...')
-        videoRef.current.srcObject = stream
         
-        // ビデオが読み込まれるまで待機
+        const video = videoRef.current
+        video.srcObject = stream
+        
+        // ビデオ要素の状態をチェック
+        console.log('ビデオ要素の初期状態:', {
+          srcObject: video.srcObject,
+          readyState: video.readyState,
+          videoWidth: video.videoWidth,
+          videoHeight: video.videoHeight
+        })
+        
+        // ビデオが読み込まれるまで待機（シンプル化）
         await new Promise((resolve, reject) => {
-          if (videoRef.current) {
-            const video = videoRef.current
-            
-            video.onloadedmetadata = () => {
+          let resolved = false
+          
+          const handleLoad = () => {
+            if (!resolved) {
+              resolved = true
               console.log('ビデオメタデータ読み込み完了:', {
                 videoWidth: video.videoWidth,
                 videoHeight: video.videoHeight,
                 readyState: video.readyState
               })
-              setDebugInfo('ビデオメタデータ読み込み完了')
+              setDebugInfo(`ビデオ表示準備完了 - ${video.videoWidth}x${video.videoHeight}`)
               resolve(true)
             }
-            
-            video.oncanplay = () => {
-              console.log('ビデオ再生可能状態')
-              setDebugInfo('ビデオ再生可能状態')
-            }
-            
-            video.onerror = (e: Event) => {
+          }
+          
+          const handleError = (e: Event) => {
+            if (!resolved) {
+              resolved = true
               console.error('ビデオエラー:', e)
               reject(new Error('ビデオの読み込みに失敗しました'))
             }
-            
-            // 5秒でタイムアウト
-            setTimeout(() => {
-              reject(new Error('ビデオの読み込みがタイムアウトしました'))
-            }, 5000)
           }
+          
+          video.onloadedmetadata = handleLoad
+          video.oncanplay = handleLoad
+          video.onerror = handleError
+          
+          // 3秒でタイムアウト（短縮）
+          setTimeout(() => {
+            if (!resolved) {
+              resolved = true
+              console.log('タイムアウトしましたが続行します')
+              setDebugInfo('タイムアウト - 強制続行')
+              resolve(true)
+            }
+          }, 3000)
         })
         
-        setDebugInfo('ビデオ再生開始...')
-        console.log('ビデオ再生開始...')
         // 明示的に再生を開始
         try {
-          await videoRef.current.play()
+          console.log('ビデオ再生開始...')
+          setDebugInfo('ビデオ再生開始...')
+          await video.play()
           console.log('ビデオ再生開始成功')
           setDebugInfo('ビデオ再生開始成功')
         } catch (playError) {
-          console.warn('自動再生に失敗しましたが、ユーザー操作で再生されます:', playError)
-          setDebugInfo('自動再生失敗、手動操作が必要')
+          console.warn('自動再生に失敗:', playError)
+          setDebugInfo('自動再生失敗（問題なし）')
+          // 自動再生の失敗は正常な動作なので続行
         }
       }
       
