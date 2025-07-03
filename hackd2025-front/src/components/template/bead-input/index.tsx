@@ -142,7 +142,7 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="text-center bg-white/90 p-8 rounded-xl">
               <Loading />
-              <p className="mt-4 text-gray-600">Generating patterns...</p>
+              {/* <p className="mt-4 text-gray-600">Generating patterns...</p> */}
             </div>
           </div>
         )}

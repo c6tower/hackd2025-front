@@ -1,7 +1,7 @@
 import React from 'react';
 import { PatternGrid } from '@/components/module/PatternGrid';
 import Button from '@/components/part/Button';
-import { BeadCounts, BeadColor, BEAD_COLOR_EMOJIS } from '@/types/index';
+import { BeadCounts, BeadColor, BEAD_COLORS } from '@/types/index';
 
 interface PatternDetailModalProps {
   /** モーダルの表示状態 */
@@ -116,10 +116,10 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
           <Button
             ref={firstFocusableRef}
             variant="secondary"
-            size="sm"
+            size="md"
             onClick={onClose}
             aria-label="Close modal"
-            className="text-gray-500 hover:text-gray-700"
+            className="!text-gray-600 hover:!text-gray-900 hover:!bg-gray-100 !bg-transparent !rounded-full !text-4xl font-bold w-12 h-12 flex items-center justify-center p-0 !border-0 !shadow-none"
           >
             ×
           </Button>
@@ -147,13 +147,20 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
                 {usedBeadCounts.map(({ color, count }) => (
                   <div
                     key={color}
-                    className="bg-gray-50 rounded-lg p-3 text-center"
+                    className="bg-gray-50 rounded-lg p-3 text-center flex gap-2 items-center justify-center"
                   >
-                    <div className="text-2xl mb-1">
-                      {BEAD_COLOR_EMOJIS[color]}
-                    </div>
-                    <div className="text-lg font-bold text-blue-600">
-                      {count} pieces
+                    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle 
+                        cx="12.1718" 
+                        cy="12.4999" 
+                        r="7.82472" 
+                        stroke={BEAD_COLORS[color]} 
+                        strokeWidth="8.69413"
+                        style={color === 'white' ? { filter: 'drop-shadow(0 0 1px rgba(0,0,0,0.3))' } : undefined}
+                      />
+                    </svg>
+                    <div className="text-lg font-bold text-gray-900">
+                      {count}
                     </div>
                   </div>
                 ))}
@@ -167,7 +174,7 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
             {/* 合計数 */}
             {usedBeadCounts.length > 0 && (
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-600">
+                <div className="text-base text-gray-600">
                   Total: {usedBeadCounts.reduce((sum, { count }) => sum + count, 0)} pieces
                 </div>
               </div>

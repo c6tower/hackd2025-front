@@ -51,7 +51,7 @@ export const PatternGrid: React.FC<PatternGridProps> = ({
       <div
         className={`
           ${containerSize}
-          border-2 rounded-lg p-2 bg-white overflow-hidden
+          border-2 rounded-lg p-2 bg-gray-200 overflow-hidden
           ${interactive ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}
           ${selected ? 'ring-4 ring-blue-500 border-blue-500' : 'border-gray-300'}
         `}

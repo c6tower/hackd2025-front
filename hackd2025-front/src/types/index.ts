@@ -1,4 +1,4 @@
-// ビーズ色定義（10色）
+// ビーズ色定義（11色：無色を含む）
 export const BEAD_COLORS = {
   red: '#FF0000',
   orange: '#FFA500', 
@@ -9,7 +9,8 @@ export const BEAD_COLORS = {
   black: '#000000',
   white: '#FFFFFF',
   pink: '#FFC0CB',
-  brown: '#A52A2A'
+  brown: '#A52A2A',
+  null: 'transparent' // 無色（透明）
 } as const;
 
 export type BeadColor = keyof typeof BEAD_COLORS;
@@ -52,7 +53,8 @@ export const BEAD_COLOR_NAMES: Record<BeadColor, string> = {
   black: '黒',
   white: '白',
   pink: 'ピンク',
-  brown: '茶'
+  brown: '茶',
+  null: '無色'
 } as const;
 
 // ビーズ色の絵文字
@@ -66,7 +68,8 @@ export const BEAD_COLOR_EMOJIS: Record<BeadColor, string> = {
   black: '⚫️',
   white: '⚪️',
   pink: '🩷',
-  brown: '🟤'
+  brown: '🟤',
+  null: '⬜️'
 } as const;
 
 // 図案データ用の色コードマッピング（memo.mdに基づく）
@@ -80,7 +83,8 @@ export const BEAD_COLOR_CODES: Record<BeadColor, string> = {
   green: 'g',
   blue: 'b',
   purple: 'v',
-  brown: 'm' // maron
+  brown: 'm', // maroon
+  null: 'n' // null（無色）
 } as const;
 
 // コードから色への逆マッピング
@@ -95,7 +99,7 @@ export const CODE_TO_BEAD_COLOR: Record<string, BeadColor> = {
   b: 'blue',
   v: 'purple',
   m: 'brown',
-  n: 'white' // null -> white として扱う
+  n: 'null' // null（無色）
 } as const;
 
 // 図案データの型
@@ -123,7 +127,8 @@ export const BEAD_COLOR_API_NAMES: Record<BeadColor, string> = {
   black: 'dark',    // APIでは"dark"を使用
   white: 'white',
   pink: 'pink',
-  brown: 'maroon'   // APIでは"maroon"を使用
+  brown: 'maroon',  // APIでは"maroon"を使用
+  null: 'null'      // APIでは"null"を使用
 } as const;
 
 // APIの色名からBeadColorへの逆マッピング
@@ -137,7 +142,8 @@ export const API_NAME_TO_BEAD_COLOR: Record<string, BeadColor> = {
   dark: 'black',
   white: 'white',
   pink: 'pink',
-  maroon: 'brown'
+  maroon: 'brown',
+  null: 'null'
 } as const;
 
 // CSS変数を含むCSSPropertiesの型定義
