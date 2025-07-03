@@ -44,15 +44,14 @@ export const PatternGrid: React.FC<PatternGridProps> = ({
     return rows;
   }, [pattern]);
 
-  const gridSize = size === 'small' ? 'w-32 h-32' : 'w-80 h-80';
-  const cellSize = size === 'small' ? 'w-2 h-2' : 'w-5 h-5';
+  const containerSize = size === 'small' ? 'w-32 h-32' : 'w-80 h-80';
   
   return (
     <div className="relative">
       <div
         className={`
-          ${gridSize}
-          grid grid-cols-16 gap-0 border-2 rounded-lg p-1 bg-white
+          ${containerSize}
+          border-2 rounded-lg p-2 bg-white overflow-hidden
           ${interactive ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}
           ${selected ? 'ring-4 ring-blue-500 border-blue-500' : 'border-gray-300'}
         `}
@@ -67,24 +66,19 @@ export const PatternGrid: React.FC<PatternGridProps> = ({
         } : undefined}
         aria-label={interactive ? `図案${patternId || ''}を選択` : undefined}
       >
-        {patternArray.map((row, rowIndex) =>
-          row.map((color, colIndex) => (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              className={`${cellSize} border border-gray-200`}
-              style={{ backgroundColor: BEAD_COLORS[color] }}
-              aria-hidden="true"
-            />
-          ))
-        )}
-      </div>
-      
-      {/* 選択状態の表示 */}
-      {selected && interactive && (
-        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-          ○選択
+        <div className="w-full h-full grid grid-cols-16 gap-0">
+          {patternArray.map((row, rowIndex) =>
+            row.map((color, colIndex) => (
+              <div
+                key={`${rowIndex}-${colIndex}`}
+                className="aspect-square border-[0.5px] border-gray-300"
+                style={{ backgroundColor: BEAD_COLORS[color] }}
+                aria-hidden="true"
+              />
+            ))
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

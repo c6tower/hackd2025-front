@@ -13,7 +13,9 @@ export default function Home() {
   const handleSubmit = async (beadCounts: BeadCounts) => {
     console.log('ビーズ数:', beadCounts);
     await getSuggestions(beadCounts);
-    setCurrentScreen('patterns');
+    if (!error && patterns.length > 0) {
+      setCurrentScreen('patterns');
+    }
   };
 
   const handleBack = () => {
@@ -26,12 +28,10 @@ export default function Home() {
     reset();
   };
 
-  if (currentScreen === 'patterns') {
+  if (currentScreen === 'patterns' && patterns.length > 0) {
     return (
       <PatternViewScreen
         patterns={patterns}
-        loading={loading}
-        error={error || undefined}
         onBack={handleBack}
         onHome={handleHome}
       />
@@ -39,6 +39,10 @@ export default function Home() {
   }
 
   return (
-    <BeadInputScreen onSubmit={handleSubmit} />
+    <BeadInputScreen 
+      onSubmit={handleSubmit}
+      loading={loading}
+      error={error || undefined}
+    />
   );
 }
