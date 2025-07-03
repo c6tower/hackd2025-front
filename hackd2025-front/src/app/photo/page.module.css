@@ -113,14 +113,14 @@
 }
 
 .homeButton img {
-  width: 96px;
-  height: 96px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
 }
 
 .homeButton svg {
-  width: 96px;
-  height: 96px;
+  width: 40px;
+  height: 40px;
 }
 
 .captureButton {
@@ -267,19 +267,24 @@
   }
   
   .homeButton img {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
   }
 
   .homeButton svg {
-    width: 80px;
-    height: 80px;
+    width: 35px;
+    height: 35px;
   }
 
   .fileButton {
     width: 70px;
     height: 70px;
     right: 1.5rem;
+  }
+
+  .fileButton svg {
+    width: 32px;
+    height: 32px;
   }
 
   .beadCounts {
