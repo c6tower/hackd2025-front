@@ -23,25 +23,12 @@ export const beadCountsToQueryParams = (beadCounts: BeadCounts): string => {
 };
 
 /**
- * APIレスポンスの型定義（実際のAPI形式に合わせて更新）
+ * APIレスポンスの型定義
  */
 export interface ApiPatternResponse {
-  id: number;
   pattern: string;
-  title: string;
+  title: string; // 図案のタイトル
   beads: Record<string, number>; // 短縮形のキー (g, m, o, など)
-  category: string;
-  total_num: number;
-  b_num: number;
-  d_num: number;
-  g_num: number;
-  m_num: number;
-  o_num: number;
-  p_num: number;
-  r_num: number;
-  v_num: number;
-  w_num: number;
-  y_num: number;
 }
 
 export interface SuggestionsApiResponse {
@@ -102,7 +89,7 @@ export const convertApiResponseToPatternData = (
       id: `${requestId}-${index + 1}`,
       pattern: item.pattern,
       beadCounts,
-      title: item.title // APIから取得したタイトルを追加
+      title: item.title || `図案 ${index + 1}` // APIから取得したタイトル、なければデフォルト
     };
   });
 };
@@ -134,12 +121,10 @@ export const fetchSuggestions = async (beadCounts: BeadCounts): Promise<PatternD
     console.log('API Response data:', data);
     data.forEach((item, index) => {
       console.log(`API Response item ${index}:`, {
-        id: item.id,
         pattern: item.pattern ? `${item.pattern.length} chars` : 'no pattern',
         title: item.title,
         beadsKeys: Object.keys(item.beads),
-        beadsValues: Object.values(item.beads),
-        category: item.category
+        beadsValues: Object.values(item.beads)
       });
     });
     
