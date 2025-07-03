@@ -1,4 +1,4 @@
-import { BeadCounts, PatternData, BEAD_COLOR_API_NAMES, BeadColor } from '@/types/index';
+import { BeadCounts, PatternData, BEAD_COLOR_API_NAMES, BeadColor, CODE_TO_BEAD_COLOR } from '@/types/index';
 
 // APIのベースURL（環境変数で設定可能）
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001';
@@ -37,22 +37,7 @@ export interface SuggestionsApiResponse {
   error?: string;
 }
 
-/**
- * APIで使用される短縮形のキーから色名へのマッピング
- */
-const SHORT_KEY_TO_BEAD_COLOR: Record<string, BeadColor> = {
-  'r': 'red',
-  'o': 'orange', 
-  'y': 'yellow',
-  'g': 'green',
-  'b': 'blue',
-  'v': 'purple',
-  'd': 'black',
-  'w': 'white',
-  'p': 'pink',
-  'm': 'brown',
-  'n': 'null'
-} as const;
+// CODE_TO_BEAD_COLORを使用（types/index.tsからインポート）
 
 /**
  * APIレスポンスをフロントエンド用データに変換
@@ -78,12 +63,19 @@ export const convertApiResponseToPatternData = (
     };
 
     // APIレスポンスの短縮形キーをフロントエンド色名に変換
+    console.log(`Item ${index} beads from API:`, item.beads);
     Object.entries(item.beads).forEach(([shortKey, count]) => {
-      const beadColor = SHORT_KEY_TO_BEAD_COLOR[shortKey];
+      console.log(`Processing shortKey: ${shortKey}, count: ${count}`);
+      const beadColor = CODE_TO_BEAD_COLOR[shortKey];
+      console.log(`Mapped to beadColor: ${beadColor}`);
       if (beadColor) {
         beadCounts[beadColor] = count;
+        console.log(`Set beadCounts[${beadColor}] = ${count}`);
+      } else {
+        console.warn(`Unknown shortKey: ${shortKey}`);
       }
     });
+    console.log(`Final beadCounts for item ${index}:`, beadCounts);
 
     return {
       id: `${requestId}-${index + 1}`,
