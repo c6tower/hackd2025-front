@@ -127,7 +127,7 @@ export default function PhotoPage() {
           </div>
           <div className={styles.bottomControls}>
             <button onClick={() => router.push('/')} className={styles.homeButton}>
-              <Image src="/home.png" alt="ホーム" width={64} height={64} priority />
+              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
               <span>ホーム</span>
             </button>
             <button onClick={startCamera} className={styles.captureButton}>
@@ -192,7 +192,7 @@ export default function PhotoPage() {
           </div>
           <div className={styles.bottomControls}>
             <button onClick={goToHome} className={styles.homeButton}>
-              <Image src="/home.png" alt="ホーム" width={64} height={64} priority />
+              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
               <span>ホーム</span>
             </button>
             <button onClick={retakePhoto} className={styles.captureButton}>

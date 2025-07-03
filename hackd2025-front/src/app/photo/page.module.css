@@ -79,13 +79,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   background: white;
   border: none;
-  border-radius: 50px;
-  padding: 2rem 2.5rem;
+  border-radius: 60px;
+  padding: 2.5rem 3rem;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #333;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -97,14 +97,14 @@
 }
 
 .homeButton img {
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
   object-fit: contain;
 }
 
 .homeButton svg {
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
 }
 
 .captureButton {
@@ -216,18 +216,18 @@
   }
 
   .homeButton {
-    padding: 1.5rem 2rem;
-    font-size: 16px;
+    padding: 2rem 2.5rem;
+    font-size: 18px;
   }
   
   .homeButton img {
-    width: 56px;
-    height: 56px;
+    width: 80px;
+    height: 80px;
   }
 
   .homeButton svg {
-    width: 56px;
-    height: 56px;
+    width: 80px;
+    height: 80px;
   }
 
   .beadCounts {
