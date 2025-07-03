@@ -17,8 +17,6 @@ interface PatternViewScreenProps {
   patterns: PatternData[];
   /** 戻るボタンのコールバック */
   onBack: () => void;
-  /** ホームボタンのコールバック */
-  onHome: () => void;
 }
 
 /**
@@ -29,7 +27,6 @@ interface PatternViewScreenProps {
 export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
   patterns,
   onBack,
-  onHome
 }) => {
   const [selectedPatternId, setSelectedPatternId] = React.useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -43,11 +40,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-  };
-
-  const handleModalHome = () => {
-    setIsModalOpen(false);
-    onHome();
   };
 
   return (
@@ -114,7 +106,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
             pattern={selectedPattern.pattern}
             beadCounts={selectedPattern.beadCounts}
             onClose={handleModalClose}
-            onHome={handleModalHome}
           />
         )}
       </div>

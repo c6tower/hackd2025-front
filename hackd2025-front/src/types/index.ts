@@ -63,10 +63,10 @@ export const BEAD_COLOR_EMOJIS: Record<BeadColor, string> = {
   green: '🟢',
   blue: '🔵',
   purple: '🟣',
-  black: '⚫',
-  white: '⚪',
+  black: '⚫️',
+  white: '⚪️',
   pink: '🩷',
-  brown: '🤎'
+  brown: '🟤'
 } as const;
 
 // 図案データ用の色コードマッピング（memo.mdに基づく）

@@ -1,7 +1,7 @@
 import React from 'react';
 import { PatternGrid } from '@/components/module/PatternGrid';
 import Button from '@/components/part/Button';
-import { BeadCounts, BeadColor, BEAD_COLOR_NAMES, BEAD_COLOR_EMOJIS } from '@/types/index';
+import { BeadCounts, BeadColor, BEAD_COLOR_EMOJIS } from '@/types/index';
 
 interface PatternDetailModalProps {
   /** モーダルの表示状態 */
@@ -12,8 +12,6 @@ interface PatternDetailModalProps {
   beadCounts: BeadCounts;
   /** 閉じるボタンのコールバック */
   onClose: () => void;
-  /** ホームボタンのコールバック */
-  onHome: () => void;
 }
 
 /**
@@ -24,8 +22,7 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
   isOpen,
   pattern,
   beadCounts,
-  onClose,
-  onHome
+  onClose
 }) => {
   // モーダルのフォーカストラップ用
   const modalRef = React.useRef<HTMLDivElement>(null);
@@ -108,35 +105,23 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
+      aria-label="Pattern detail modal"
     >
       <div
         ref={modalRef}
         className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
         {/* ヘッダー */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex justify-end p-4">
           <Button
             ref={firstFocusableRef}
             variant="secondary"
             size="sm"
             onClick={onClose}
-            aria-label="モーダルを閉じる"
+            aria-label="Close modal"
+            className="text-gray-500 hover:text-gray-700"
           >
-            × 閉じる
-          </Button>
-          
-          <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
-            図案詳細
-          </h2>
-          
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onHome}
-            aria-label="ホームに戻る"
-          >
-            🏠 ホーム
+            ×
           </Button>
         </div>
 
@@ -154,7 +139,7 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
           {/* 必要ビーズ数 */}
           <div className="text-center">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              必要なビーズ
+              Required Beads
             </h3>
             
             {usedBeadCounts.length > 0 ? (
@@ -167,18 +152,15 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
                     <div className="text-2xl mb-1">
                       {BEAD_COLOR_EMOJIS[color]}
                     </div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {BEAD_COLOR_NAMES[color]}
-                    </div>
                     <div className="text-lg font-bold text-blue-600">
-                      {count}個
+                      {count} pieces
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-gray-500">
-                ビーズ情報が取得できませんでした
+                Bead information could not be retrieved
               </div>
             )}
 
@@ -186,7 +168,7 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
             {usedBeadCounts.length > 0 && (
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="text-sm text-gray-600">
-                  合計: {usedBeadCounts.reduce((sum, { count }) => sum + count, 0)}個
+                  Total: {usedBeadCounts.reduce((sum, { count }) => sum + count, 0)} pieces
                 </div>
               </div>
             )}

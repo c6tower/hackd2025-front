@@ -25,17 +25,11 @@ export default function Home() {
     reset();
   };
 
-  const handleHome = () => {
-    setCurrentScreen('input');
-    reset();
-  };
-
   if (currentScreen === 'patterns' && patterns.length > 0) {
     return (
       <PatternViewScreen
         patterns={patterns}
         onBack={handleBack}
-        onHome={handleHome}
       />
     );
   }
