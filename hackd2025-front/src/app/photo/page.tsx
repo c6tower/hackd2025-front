@@ -20,6 +20,7 @@ export default function PhotoPage() {
   const [debugInfo, setDebugInfo] = useState<string>('')
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
   const startCamera = async () => {
@@ -28,9 +29,24 @@ export default function PhotoPage() {
       setDebugInfo('カメラ初期化開始...')
       console.log('カメラ初期化開始...')
       
+      // 詳細な環境情報をログ出力
+      console.log('環境情報:', {
+        userAgent: navigator.userAgent,
+        isSecureContext: window.isSecureContext,
+        protocol: window.location.protocol,
+        mediaDevices: !!navigator.mediaDevices,
+        getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+      })
+      
       // WebRTC対応チェック
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('お使いのブラウザはカメラ機能をサポートしていません')
+        throw new Error(`お使いのブラウザはカメラ機能をサポートしていません。プロトコル: ${window.location.protocol}`)
+      }
+      
+      // HTTPS チェック
+      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+        setDebugInfo('⚠️ HTTPSではありません。カメラアクセスが制限される可能性があります')
+        console.warn('HTTPS以外の環境:', window.location.protocol)
       }
       
       // 最も基本的な制約で開始（成功率を上げるため）
@@ -132,16 +148,21 @@ export default function PhotoPage() {
       console.log('カメラ初期化完了')
     } catch (err) {
       let errorMessage = 'カメラへのアクセスが拒否されました'
+      let debugMessage = ''
       
       console.error('カメラエラー詳細:', err)
       
       if (err instanceof Error) {
+        debugMessage = `エラー名: ${err.name}, メッセージ: ${err.message}`
+        
         if (err.name === 'NotAllowedError') {
           errorMessage = 'カメラの使用許可が必要です。ブラウザの設定でカメラアクセスを許可してください。'
         } else if (err.name === 'NotFoundError') {
           errorMessage = 'カメラが見つかりません。デバイスにカメラが接続されているか確認してください。'
         } else if (err.name === 'NotReadableError') {
           errorMessage = 'カメラが他のアプリケーションで使用されています。'
+        } else if (err.name === 'OverconstrainedError') {
+          errorMessage = 'カメラの設定に問題があります。'
         } else if (err.message.includes('タイムアウト')) {
           errorMessage = 'カメラの初期化がタイムアウトしました。再度お試しください。'
         } else {
@@ -149,7 +170,8 @@ export default function PhotoPage() {
         }
       }
       
-      setError(errorMessage)
+      setError(errorMessage + ' 代わりにファイル選択をお試しください。')
+      setDebugInfo(`❌ ${debugMessage}`)
     }
   }
 
@@ -227,6 +249,23 @@ export default function PhotoPage() {
     setError(null)
   }
 
+  const handleFileSelect = (event: any) => {
+    const file = event.target.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        setCapturedImage(result)
+        setDebugInfo('ファイルから画像を読み込み完了')
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const openFileDialog = () => {
+    fileInputRef.current?.click()
+  }
+
   const goToHome = () => {
     if (beadCounts) {
       // ビーズカウントデータをセッションストレージに保存
@@ -249,10 +288,31 @@ export default function PhotoPage() {
             <button onClick={() => router.push('/')} className={styles.homeButton}>
               <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
             </button>
-            <button onClick={startCamera} className={styles.captureButton}>
-              撮影
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+              <button onClick={startCamera} className={styles.captureButton}>
+                撮影
+              </button>
+              <button onClick={openFileDialog} style={{
+                background: 'rgba(255,255,255,0.9)',
+                border: 'none',
+                borderRadius: '25px',
+                padding: '8px 16px',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#333',
+                cursor: 'pointer'
+              }}>
+                📁 ファイル選択
+              </button>
+            </div>
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
         </div>
       )}
 
@@ -285,7 +345,7 @@ export default function PhotoPage() {
           <img src={capturedImage} alt="Captured" className={styles.preview} />
           <div className={styles.bottomControls}>
             <button onClick={retakePhoto} disabled={isLoading} className={styles.homeButton}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="20" height="20" viewBox="-7 -8 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 1L23 23M16.72 16.72C15.2108 17.5291 13.6225 17.9998 12 18C5.17084 18 0.499847 12 0.499847 12C1.64419 9.21966 3.20467 6.66212 5.09799 4.5M9.87868 6.12C10.5481 5.74174 11.2704 5.50049 12 5.50049C14.5 5.50049 16.5 7.78049 16.5 10.5C16.5 11.3242 16.281 12.0954 15.9026 12.7518M12 18C18.8291 18 23.5001 12 23.5001 12C22.8764 10.45 22.1264 8.97204 21.2655 7.58" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
@@ -325,7 +385,7 @@ export default function PhotoPage() {
         </div>
       )}
 
-      {debugInfo && process.env.NODE_ENV === 'development' && (
+      {debugInfo && (
         <div style={{
           position: 'fixed',
           top: '10px',
