@@ -279,15 +279,34 @@ export default function PhotoPage() {
   }
 
   const handleFileSelect = (event: any) => {
-    const file = event.target.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setCapturedImage(result)
-        setDebugInfo('ファイルから画像を読み込み完了')
+    try {
+      const file = event.target.files?.[0]
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          try {
+            const result = e.target?.result as string
+            setCapturedImage(result)
+            setDebugInfo('ファイルから画像を読み込み完了')
+          } catch (error) {
+            console.error('ファイル読み込みエラー:', error)
+            setError('ファイルの読み込みに失敗しました')
+            setDebugInfo('ファイル読み込みエラー')
+          }
+        }
+        reader.onerror = () => {
+          setError('ファイルの読み込みに失敗しました')
+          setDebugInfo('FileReader エラー')
+        }
+        reader.readAsDataURL(file)
+      } else {
+        setError('有効な画像ファイルを選択してください')
+        setDebugInfo('無効なファイル形式')
       }
-      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('ファイル選択エラー:', error)
+      setError('ファイル選択でエラーが発生しました')
+      setDebugInfo('ファイル選択エラー')
     }
   }
 
@@ -296,18 +315,24 @@ export default function PhotoPage() {
   }
 
   const goToHome = () => {
-    if (beadCounts) {
-      // ビーズカウントデータをセッションストレージに保存
-      const dataToSave = JSON.stringify(beadCounts);
-      sessionStorage.setItem('beadCounts', dataToSave);
-      console.log('ビーズデータをsessionStorageに保存しました:', beadCounts);
-      console.log('保存されたデータ:', dataToSave);
-      setDebugInfo('ビーズデータを保存してホームに移動中...');
-    } else {
-      console.log('保存するビーズデータがありません');
-      setDebugInfo('ビーズデータなしでホームに移動中...');
+    try {
+      if (beadCounts) {
+        // ビーズカウントデータをセッションストレージに保存
+        const dataToSave = JSON.stringify(beadCounts);
+        sessionStorage.setItem('beadCounts', dataToSave);
+        console.log('ビーズデータをsessionStorageに保存しました:', beadCounts);
+        console.log('保存されたデータ:', dataToSave);
+        setDebugInfo('ビーズデータを保存してホームに移動中...');
+      } else {
+        console.log('保存するビーズデータがありません');
+        setDebugInfo('ビーズデータなしでホームに移動中...');
+      }
+      router.push('/')
+    } catch (error) {
+      console.error('ホームへの遷移でエラーが発生:', error)
+      setDebugInfo('エラーが発生しましたが、ホームに移動します')
+      router.push('/')
     }
-    router.push('/')
   }
 
   return (
