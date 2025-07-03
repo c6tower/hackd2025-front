@@ -37,6 +37,24 @@ export interface PatternResponse {
   beads: Record<BeadColor, number>; // 色別使用数
 }
 
+// ビーズカウントAPI用の型定義
+export interface BeadCountResponse {
+  beads: {
+    [key: string]: number
+  }
+}
+
+// API エラークラス
+export class ApiError extends Error {
+  status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 // ビーズ使用数の型
 export type BeadCounts = {
   [K in BeadColor]: number;

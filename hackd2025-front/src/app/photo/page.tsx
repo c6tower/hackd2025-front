@@ -4,24 +4,25 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import styles from './page.module.css'
-
-interface BeadCountResponse {
-  beads: {
-    [key: string]: number
-  }
-}
+import { useBeadCount } from '../../hooks/useBeadCount'
 
 export default function PhotoPage() {
   const [isCapturing, setIsCapturing] = useState(false)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [beadCounts, setBeadCounts] = useState<BeadCountResponse | null>(null)
+  
+  // ビーズカウント機能をhookから取得
+  const { beadCounts, isLoading, error: apiError, getBeadCount, reset: resetBeadCount } = useBeadCount()
+  
+  // カメラ関連のエラー状態（APIエラーとは分離）
+  const [cameraError, setCameraError] = useState<string | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+
+  // 統合されたエラー表示用
+  const error = apiError || cameraError
 
   // ページマウント時に自動でカメラを起動
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function PhotoPage() {
 
   const startCamera = async () => {
     try {
-      setError(null)
+      setCameraError(null)
       setIsCapturing(true) // カメラボタンを押した瞬間に状態を変更
       
       // WebRTC対応チェック
@@ -122,7 +123,7 @@ export default function PhotoPage() {
         }
       }
       
-      setError(errorMessage + ' カメラを手動で起動するか、ファイル選択をお試しください。')
+      setCameraError(errorMessage + ' カメラを手動で起動するか、ファイル選択をお試しください。')
     }
   }
 
@@ -161,43 +162,13 @@ export default function PhotoPage() {
 
   const sendImageToAPI = async () => {
     if (!capturedImage) return
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const blob = await fetch(capturedImage).then(r => r.blob())
-      const formData = new FormData()
-      formData.append('image', blob, 'photo.jpg')
-
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001'
-      const response = await fetch(`${API_BASE_URL}/api/beadscount`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json',
-        }
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`API request failed: ${response.status} ${errorText}`)
-      }
-
-      const data: BeadCountResponse = await response.json()
-      setBeadCounts(data)
-    } catch {
-      const errorMessage = '画像の処理中にエラーが発生しました。カメラ機能やAPIサーバーが正常に動作していることを確認してください。'
-      setError(errorMessage)
-    } finally {
-      setIsLoading(false)
-    }
+    await getBeadCount(capturedImage)
   }
 
   const retakePhoto = () => {
     setCapturedImage(null)
-    setBeadCounts(null)
-    setError(null)
+    resetBeadCount()
+    setCameraError(null)
   }
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -210,18 +181,18 @@ export default function PhotoPage() {
             const result = e.target?.result as string
             setCapturedImage(result)
           } catch {
-            setError('ファイルの読み込みに失敗しました')
+            setCameraError('ファイルの読み込みに失敗しました')
           }
         }
         reader.onerror = () => {
-          setError('ファイルの読み込みに失敗しました')
+          setCameraError('ファイルの読み込みに失敗しました')
         }
         reader.readAsDataURL(file)
       } else {
-        setError('有効な画像ファイルを選択してください')
+        setCameraError('有効な画像ファイルを選択してください')
       }
     } catch {
-      setError('ファイル選択でエラーが発生しました')
+      setCameraError('ファイル選択でエラーが発生しました')
     }
   }
 
