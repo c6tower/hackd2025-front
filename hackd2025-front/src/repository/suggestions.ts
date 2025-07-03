@@ -1,4 +1,4 @@
-import { BeadCounts, PatternData, BEAD_COLOR_API_NAMES, API_NAME_TO_BEAD_COLOR, BeadColor } from '@/types/index';
+import { BeadCounts, PatternData, BEAD_COLOR_API_NAMES, BeadColor } from '@/types/index';
 
 // APIのベースURL（環境変数で設定可能）
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001';
@@ -23,12 +23,25 @@ export const beadCountsToQueryParams = (beadCounts: BeadCounts): string => {
 };
 
 /**
- * APIレスポンスの型定義
+ * APIレスポンスの型定義（実際のAPI形式に合わせて更新）
  */
 export interface ApiPatternResponse {
+  id: number;
   pattern: string;
-  beads: Record<string, number>; // APIはフルネームで返す
-  title?: string; // 図案のタイトル
+  title: string;
+  beads: Record<string, number>; // 短縮形のキー (g, m, o, など)
+  category: string;
+  total_num: number;
+  b_num: number;
+  d_num: number;
+  g_num: number;
+  m_num: number;
+  o_num: number;
+  p_num: number;
+  r_num: number;
+  v_num: number;
+  w_num: number;
+  y_num: number;
 }
 
 export interface SuggestionsApiResponse {
@@ -38,6 +51,23 @@ export interface SuggestionsApiResponse {
 }
 
 /**
+ * APIで使用される短縮形のキーから色名へのマッピング
+ */
+const SHORT_KEY_TO_BEAD_COLOR: Record<string, BeadColor> = {
+  'r': 'red',
+  'o': 'orange', 
+  'y': 'yellow',
+  'g': 'green',
+  'b': 'blue',
+  'v': 'purple',
+  'd': 'black',
+  'w': 'white',
+  'p': 'pink',
+  'm': 'brown',
+  'n': 'null'
+} as const;
+
+/**
  * APIレスポンスをフロントエンド用データに変換
  */
 export const convertApiResponseToPatternData = (
@@ -45,7 +75,7 @@ export const convertApiResponseToPatternData = (
   requestId: string = ''
 ): PatternData[] => {
   return apiResponse.map((item, index) => {
-    // APIのフルネーム形式をフロントエンド形式に変換
+    // BeadCountsの初期化
     const beadCounts: BeadCounts = {
       red: 0,
       orange: 0,
@@ -60,9 +90,9 @@ export const convertApiResponseToPatternData = (
       null: 0
     };
 
-    // APIレスポンスのフルネームをフロントエンド色名に変換
-    Object.entries(item.beads).forEach(([apiColorName, count]) => {
-      const beadColor = API_NAME_TO_BEAD_COLOR[apiColorName];
+    // APIレスポンスの短縮形キーをフロントエンド色名に変換
+    Object.entries(item.beads).forEach(([shortKey, count]) => {
+      const beadColor = SHORT_KEY_TO_BEAD_COLOR[shortKey];
       if (beadColor) {
         beadCounts[beadColor] = count;
       }
@@ -104,10 +134,12 @@ export const fetchSuggestions = async (beadCounts: BeadCounts): Promise<PatternD
     console.log('API Response data:', data);
     data.forEach((item, index) => {
       console.log(`API Response item ${index}:`, {
+        id: item.id,
         pattern: item.pattern ? `${item.pattern.length} chars` : 'no pattern',
         title: item.title,
         beadsKeys: Object.keys(item.beads),
-        beadsValues: Object.values(item.beads)
+        beadsValues: Object.values(item.beads),
+        category: item.category
       });
     });
     
