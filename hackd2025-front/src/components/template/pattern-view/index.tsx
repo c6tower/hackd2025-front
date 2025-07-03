@@ -66,6 +66,15 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
           <div className="inline-block text-gray-900 font-bold rounded-full text-2xl px-6 py-3 bg-white mt-4 sm:mt-6">
             Pick one you like.
           </div>
+          
+          {/* 選択されたパターンのタイトル表示 */}
+          {selectedPattern?.title && (
+            <div className="mt-4 sm:mt-6">
+              <div className="inline-block text-purple-700 font-semibold text-xl px-4 py-2 bg-white/90 rounded-lg">
+                Selected: {selectedPattern.title}
+              </div>
+            </div>
+          )}
         </header>
 
         <main>
