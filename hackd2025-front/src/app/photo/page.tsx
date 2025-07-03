@@ -60,7 +60,7 @@ export default function PhotoPage() {
       
       // WebRTC対応チェック
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error(`お使いのブラウザはカメラ機能をサポートしていません。プロトコル: ${window.location.protocol}`)
+        throw new Error(`Your browser does not support camera functionality. Protocol: ${window.location.protocol}`)
       }
       
       // 最も基本的な制約で開始（成功率を上げるため）
@@ -105,25 +105,25 @@ export default function PhotoPage() {
       // setIsCapturing(true) // 既に上で設定済み
     } catch (err) {
       setIsCapturing(false) // エラー時は状態をリセット
-      let errorMessage = 'カメラへのアクセスが拒否されました'
+      let errorMessage = 'Camera access was denied'
       
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
-          errorMessage = 'カメラの使用許可が必要です。ブラウザの設定でカメラアクセスを許可してください。'
+          errorMessage = 'Camera permission is required. Please allow camera access in your browser settings.'
         } else if (err.name === 'NotFoundError') {
-          errorMessage = 'カメラが見つかりません。デバイスにカメラが接続されているか確認してください。'
+          errorMessage = 'Camera not found. Please check if a camera is connected to your device.'
         } else if (err.name === 'NotReadableError') {
-          errorMessage = 'カメラが他のアプリケーションで使用されています。'
+          errorMessage = 'Camera is being used by another application.'
         } else if (err.name === 'OverconstrainedError') {
-          errorMessage = 'カメラの設定に問題があります。'
+          errorMessage = 'There is an issue with the camera settings.'
         } else if (err.message.includes('タイムアウト')) {
-          errorMessage = 'カメラの初期化がタイムアウトしました。再度お試しください。'
+          errorMessage = 'Camera initialization timed out. Please try again.'
         } else {
-          errorMessage = `カメラエラー: ${err.message}`
+          errorMessage = `Camera error: ${err.message}`
         }
       }
       
-      setCameraError(errorMessage + ' カメラを手動で起動するか、ファイル選択をお試しください。')
+      setCameraError(errorMessage + ' Please try starting the camera manually or select a file.')
     }
   }
 
@@ -211,18 +211,18 @@ export default function PhotoPage() {
             }
             img.src = result
           } catch {
-            setCameraError('ファイルの読み込みに失敗しました')
+            setCameraError('Failed to read file')
           }
         }
         reader.onerror = () => {
-          setCameraError('ファイルの読み込みに失敗しました')
+          setCameraError('Failed to read file')
         }
         reader.readAsDataURL(file)
       } else {
-        setCameraError('有効な画像ファイルを選択してください')
+        setCameraError('Please select a valid image file')
       }
     } catch {
-      setCameraError('ファイル選択でエラーが発生しました')
+      setCameraError('An error occurred during file selection')
     }
     
     // ファイル入力をリセット（同じファイルを再選択できるようにする）
@@ -248,40 +248,40 @@ export default function PhotoPage() {
 
   const goToBeadInput = () => {
     try {
-      console.log('goToBeadInput実行開始');
+      console.log('Starting goToBeadInput execution');
       console.log('beadCounts:', beadCounts);
       
       if (beadCounts) {
         // ビーズカウントデータをセッションストレージに保存
         const dataToSave = JSON.stringify(beadCounts);
-        console.log('保存するデータ:', dataToSave);
+        console.log('Data to save:', dataToSave);
         
         // 保存前にクリア
         sessionStorage.removeItem('beadCounts');
         
         // 保存
         sessionStorage.setItem('beadCounts', dataToSave);
-        console.log('sessionStorageに保存完了');
+        console.log('Saved to sessionStorage successfully');
         
         // 保存後に確認
         const saved = sessionStorage.getItem('beadCounts');
-        console.log('保存確認:', saved);
+        console.log('Verification of saved data:', saved);
         
         // URLパラメータも併用（バックアップ）
         const encodedData = encodeURIComponent(dataToSave);
-        console.log('URLパラメータ用データ:', encodedData);
+        console.log('URL parameter data:', encodedData);
         
         // 少し待ってから遷移
         setTimeout(() => {
-          console.log('ホーム画面に遷移します');
+          console.log('Navigating to home screen');
           router.push(`/?camera_data=${encodedData}`);
         }, 100);
       } else {
-        console.log('beadCountsが空です');
+        console.log('beadCounts is empty');
         router.push('/');
       }
     } catch (error) {
-      console.error('goToBeadInputでエラー:', error);
+      console.error('Error in goToBeadInput:', error);
       router.push('/');
     }
   }
@@ -318,10 +318,10 @@ export default function PhotoPage() {
           </div>
           <div className={styles.bottomControls}>
             <button onClick={() => router.push('/')} className={styles.homeButton}>
-              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
+              <Image src="/home.png" alt="Home" width={128} height={128} priority />
             </button>
             <button onClick={capturePhoto} className={styles.captureButton}>
-              撮影
+              Capture
             </button>
             <button onClick={openFileDialog} className={styles.fileButton}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -355,11 +355,11 @@ export default function PhotoPage() {
             }}
           />
           <div className={styles.resultTitle}>
-            解析中...
+            Analyzing...
           </div>
           <div className={styles.bottomControls}>
             <button onClick={() => router.push('/')} className={styles.homeButton}>
-              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
+              <Image src="/home.png" alt="Home" width={128} height={128} priority />
             </button>
           </div>
         </div>
@@ -379,24 +379,24 @@ export default function PhotoPage() {
               height: 'auto'
             }}
           />
-          <h2 className={styles.resultTitle}>ビーズ数の計算結果</h2>
+          <h2 className={styles.resultTitle}>Bead Count Results</h2>
           <div className={styles.beadCounts}>
             {Object.entries(beadCounts.beads).map(([color, count]) => (
               <div key={color} className={styles.beadItem}>
                 <span className={styles.colorName}>{color}</span>
-                <span className={styles.count}>{count}個</span>
+                <span className={styles.count}>{count} pieces</span>
               </div>
             ))}
           </div>
           <div className={styles.bottomControls}>
             <button onClick={goToHome} className={styles.homeButton}>
-              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
+              <Image src="/home.png" alt="Home" width={128} height={128} priority />
             </button>
             <button onClick={retakePhoto} className={styles.captureButton}>
-              撮り直す
+              Retake
             </button>
             <button onClick={goToBeadInput} className={styles.decisionButton}>
-              決定
+              Confirm
             </button>
           </div>
         </div>
