@@ -135,7 +135,7 @@ export default function PhotoPage() {
     setIsCapturing(false)
   }
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (!videoRef.current) return
 
     const video = videoRef.current
@@ -160,17 +160,17 @@ export default function PhotoPage() {
     const imageData = canvas.toDataURL('image/jpeg', 0.8) // 品質を0.8に設定
     setCapturedImage(imageData)
     stopCamera()
-  }
-
-  const sendImageToAPI = async () => {
-    if (!capturedImage) return
-    await getBeadCount(capturedImage)
+    
+    // 自動的に解析を開始
+    await getBeadCount(imageData)
   }
 
   const retakePhoto = () => {
     setCapturedImage(null)
     resetBeadCount()
     setCameraError(null)
+    // カメラを再起動
+    startCamera()
   }
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +184,7 @@ export default function PhotoPage() {
             
             // 画像を正方形にクロップ・リサイズ
             const img = document.createElement('img')
-            img.onload = () => {
+            img.onload = async () => {
               const targetSize = 512
               const canvas = document.createElement('canvas')
               canvas.width = targetSize
@@ -201,6 +201,9 @@ export default function PhotoPage() {
               ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, targetSize, targetSize)
               const processedImageData = canvas.toDataURL('image/jpeg', 0.8)
               setCapturedImage(processedImageData)
+              
+              // 自動的に解析を開始
+              await getBeadCount(processedImageData)
             }
             img.src = result
           } catch {
@@ -287,12 +290,21 @@ export default function PhotoPage() {
                 opacity: 1
               }}
             />
+            {/* 20x20 格子オーバーレイ */}
+            <div className={styles.gridOverlay}>
+              <svg className={styles.grid} viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,255,255,1)" strokeWidth="0.5"/>
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+              </svg>
+            </div>
           </div>
           <div className={styles.bottomControls}>
-            <button onClick={stopCamera} className={styles.homeButton}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            <button onClick={() => router.push('/')} className={styles.homeButton}>
+              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
             </button>
             <button onClick={capturePhoto} className={styles.captureButton}>
               撮影
@@ -301,7 +313,7 @@ export default function PhotoPage() {
         </div>
       )}
 
-      {capturedImage && !beadCounts && (
+      {capturedImage && !beadCounts && isLoading && (
         <div className={styles.previewSection}>
           <Image 
             src={capturedImage} 
@@ -315,14 +327,12 @@ export default function PhotoPage() {
               height: 'auto'
             }}
           />
+          <div className={styles.resultTitle}>
+            解析中...
+          </div>
           <div className={styles.bottomControls}>
-            <button onClick={retakePhoto} disabled={isLoading} className={styles.homeButton}>
-              <svg width="20" height="20" viewBox="-7 -8 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1L23 23M16.72 16.72C15.2108 17.5291 13.6225 17.9998 12 18C5.17084 18 0.499847 12 0.499847 12C1.64419 9.21966 3.20467 6.66212 5.09799 4.5M9.87868 6.12C10.5481 5.74174 11.2704 5.50049 12 5.50049C14.5 5.50049 16.5 7.78049 16.5 10.5C16.5 11.3242 16.281 12.0954 15.9026 12.7518M12 18C18.8291 18 23.5001 12 23.5001 12C22.8764 10.45 22.1264 8.97204 21.2655 7.58" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            <button onClick={sendImageToAPI} disabled={isLoading} className={styles.captureButton}>
-              {isLoading ? '処理中...' : '解析'}
+            <button onClick={() => router.push('/')} className={styles.homeButton}>
+              <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
             </button>
           </div>
         </div>
