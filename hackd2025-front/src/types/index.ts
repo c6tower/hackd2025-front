@@ -129,6 +129,7 @@ export const CODE_TO_BEAD_COLOR: Record<string, BeadColor> = {
 // 図案データの型
 export interface PatternData {
   id: string;
+  title: string;
   pattern: string; // 256文字の図案データ
   beadCounts: BeadCounts;
 }

@@ -27,6 +27,7 @@ export const beadCountsToQueryParams = (beadCounts: BeadCounts): string => {
  */
 export interface ApiPatternResponse {
   pattern: string;
+  title: string;
   beads: Record<string, number>; // APIはフルネームで返す
 }
 
@@ -69,6 +70,7 @@ export const convertApiResponseToPatternData = (
 
     return {
       id: `${requestId}-${index + 1}`,
+      title: item.title,
       pattern: item.pattern,
       beadCounts
     };
