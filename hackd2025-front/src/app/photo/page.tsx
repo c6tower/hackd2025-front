@@ -147,15 +147,17 @@ export default function PhotoPage() {
     const offsetX = (videoWidth - size) / 2
     const offsetY = (videoHeight - size) / 2
 
+    // APIに送信する画像のサイズを512x512に統一
+    const targetSize = 512
     const canvas = document.createElement('canvas')
-    canvas.width = size
-    canvas.height = size
+    canvas.width = targetSize
+    canvas.height = targetSize
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // 正方形にクロップして描画
-    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size)
-    const imageData = canvas.toDataURL('image/jpeg')
+    // 正方形にクロップして、指定サイズにリサイズして描画
+    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, targetSize, targetSize)
+    const imageData = canvas.toDataURL('image/jpeg', 0.8) // 品質を0.8に設定
     setCapturedImage(imageData)
     stopCamera()
   }
@@ -179,7 +181,28 @@ export default function PhotoPage() {
         reader.onload = (e) => {
           try {
             const result = e.target?.result as string
-            setCapturedImage(result)
+            
+            // 画像を正方形にクロップ・リサイズ
+            const img = document.createElement('img')
+            img.onload = () => {
+              const targetSize = 512
+              const canvas = document.createElement('canvas')
+              canvas.width = targetSize
+              canvas.height = targetSize
+              const ctx = canvas.getContext('2d')
+              if (!ctx) return
+              
+              // 正方形にクロップするための計算
+              const size = Math.min(img.width, img.height)
+              const offsetX = (img.width - size) / 2
+              const offsetY = (img.height - size) / 2
+              
+              // 正方形にクロップして、指定サイズにリサイズして描画
+              ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, targetSize, targetSize)
+              const processedImageData = canvas.toDataURL('image/jpeg', 0.8)
+              setCapturedImage(processedImageData)
+            }
+            img.src = result
           } catch {
             setCameraError('ファイルの読み込みに失敗しました')
           }
