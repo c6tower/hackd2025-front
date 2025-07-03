@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { BeadColor, BEAD_COLORS, BEAD_COLOR_NAMES, CSSPropertiesWithVars } from '@/types';
 
 interface BeadInputProps {
@@ -19,8 +19,6 @@ export default function BeadInput({
   max = 256 
 }: BeadInputProps) {
   const [inputValue, setInputValue] = useState(value.toString());
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value, 10);
@@ -77,44 +75,19 @@ export default function BeadInput({
     }
   }, [inputValue, value, onChange, min, max]);
 
+  // シンプルなクリックハンドラー
   const handleStepperClick = useCallback((delta: number) => {
     const newValue = Math.max(min, Math.min(max, value + delta));
-    onChange(newValue);
-    setInputValue(newValue.toString());
-  }, [value, onChange, min, max]);
-
-  const handleStepperMouseDown = useCallback((delta: number) => {
-    handleStepperClick(delta);
-    
-    timeoutRef.current = setTimeout(() => {
-      intervalRef.current = setInterval(() => {
-        handleStepperClick(delta);
-      }, 100);
-    }, 500);
-  }, [handleStepperClick]);
-
-  const handleStepperMouseUp = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    if (newValue !== value) {
+      onChange(newValue);
+      setInputValue(newValue.toString());
     }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
+  }, [onChange, min, max, value]);
 
   // valueが外部から変更された場合にinputValueを同期
   useEffect(() => {
     setInputValue(value.toString());
   }, [value]);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -146,11 +119,7 @@ export default function BeadInput({
 
       {/* ステッパー（マイナス） */}
       <button
-        onMouseDown={() => handleStepperMouseDown(-1)}
-        onMouseUp={handleStepperMouseUp}
-        onMouseLeave={handleStepperMouseUp}
-        onTouchStart={() => handleStepperMouseDown(-1)}
-        onTouchEnd={handleStepperMouseUp}
+        onClick={() => handleStepperClick(-1)}
         disabled={value <= min}
         className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold text-2xl flex items-center justify-center transition-colors touch-manipulation"
         aria-label={`${BEAD_COLOR_NAMES[color]}を1個減らす`}
@@ -173,11 +142,7 @@ export default function BeadInput({
 
       {/* ステッパー（プラス） */}
       <button
-        onMouseDown={() => handleStepperMouseDown(1)}
-        onMouseUp={handleStepperMouseUp}
-        onMouseLeave={handleStepperMouseUp}
-        onTouchStart={() => handleStepperMouseDown(1)}
-        onTouchEnd={handleStepperMouseUp}
+        onClick={() => handleStepperClick(1)}
         disabled={value >= max}
         className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold text-2xl flex items-center justify-center transition-colors touch-manipulation"
         aria-label={`${BEAD_COLOR_NAMES[color]}を1個増やす`}
