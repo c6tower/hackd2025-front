@@ -40,10 +40,10 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vw;
-  max-width: 400px;
-  max-height: 400px;
+  width: 90vw;
+  height: 90vw;
+  max-width: 600px;
+  max-height: 600px;
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -96,13 +96,13 @@
 }
 
 .homeButton img {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
 }
 
 .homeButton svg {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
 }
 
 .captureButton {
@@ -219,13 +219,13 @@
   }
   
   .homeButton img {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
   }
 
   .homeButton svg {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
   }
 
   .beadCounts {
