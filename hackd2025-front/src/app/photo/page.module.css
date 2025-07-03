@@ -30,9 +30,9 @@
 }
 
 .cameraIcon {
-  width: 150px;
-  height: 150px;
-  object-fit: contain;
+  width: 120px;
+  height: 120px;
+  color: #666;
 }
 
 .videoContainer {

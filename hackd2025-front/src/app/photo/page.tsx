@@ -120,13 +120,10 @@ export default function PhotoPage() {
       {!capturedImage && !isCapturing && (
         <div className={styles.startSection}>
           <div className={styles.cameraIconContainer}>
-            <Image 
-              src="/camera.png" 
-              alt="カメラ" 
-              width={150} 
-              height={150} 
-              className={styles.cameraIcon}
-            />
+            <svg className={styles.cameraIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23 19C23 20.1046 22.1046 21 21 21H3C1.89543 21 1 20.1046 1 19V8C1 6.89543 1.89543 6 3 6H7L9 3H15L17 6H21C22.1046 6 23 6.89543 23 8V19Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2"/>
+            </svg>
           </div>
           <div className={styles.bottomControls}>
             <button onClick={() => router.push('/')} className={styles.homeButton}>
