@@ -1,4 +1,4 @@
-import { beadCountsToQueryParams, convertApiResponseToPatternData } from './api';
+import { beadCountsToQueryParams, convertApiResponseToPatternData } from './suggestions';
 import { BeadCounts } from '@/types/index';
 
 // fetchのモック
@@ -115,7 +115,7 @@ describe('API Utils', () => {
         json: async () => mockResponse
       });
 
-      const { fetchSuggestions } = await import('./api');
+      const { fetchSuggestions } = await import('./suggestions');
       
       const beadCounts: BeadCounts = {
         red: 10, orange: 0, yellow: 0, green: 0, blue: 5,
@@ -144,7 +144,7 @@ describe('API Utils', () => {
         status: 500
       });
 
-      const { fetchSuggestions } = await import('./api');
+      const { fetchSuggestions } = await import('./suggestions');
       
       const beadCounts: BeadCounts = {
         red: 10, orange: 0, yellow: 0, green: 0, blue: 0,
@@ -157,7 +157,7 @@ describe('API Utils', () => {
     it('ネットワークエラー時に例外を投げる', async () => {
       (fetch as jest.Mock).mockRejectedValueOnce(new Error('Failed to fetch'));
 
-      const { fetchSuggestions } = await import('./api');
+      const { fetchSuggestions } = await import('./suggestions');
       
       const beadCounts: BeadCounts = {
         red: 10, orange: 0, yellow: 0, green: 0, blue: 0,

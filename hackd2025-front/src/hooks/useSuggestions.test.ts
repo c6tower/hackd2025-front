@@ -7,7 +7,7 @@ jest.mock('@/lib/api', () => ({
   fetchSuggestions: jest.fn()
 }));
 
-import { fetchSuggestions } from '@/lib/api';
+import { fetchSuggestions } from '@/repository/suggestions';
 
 const mockFetchSuggestions = fetchSuggestions as jest.MockedFunction<typeof fetchSuggestions>;
 

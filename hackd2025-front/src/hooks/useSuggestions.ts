@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { BeadCounts, PatternData } from '@/types/index';
-import { fetchSuggestions } from '@/lib/api';
+import { fetchSuggestions } from '@/repository/suggestions';
 
 interface UseSuggestionsReturn {
   /** 図案データ */
