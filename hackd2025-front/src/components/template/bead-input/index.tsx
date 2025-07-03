@@ -142,7 +142,7 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="text-center bg-white/90 p-8 rounded-xl">
               <Loading />
-              <p className="mt-4 text-gray-600">図案を生成中...</p>
+              <p className="mt-4 text-gray-600">Generating patterns...</p>
             </div>
           </div>
         )}
@@ -153,13 +153,13 @@ export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputS
             <div className="text-center max-w-md mx-auto p-6 bg-white/90 rounded-xl">
               <div className="text-red-500 text-6xl mt-4">⚠️</div>
               <h2 className="text-xl font-semibold text-gray-900 mt-2">
-                エラーが発生しました
+                An error occurred
               </h2>
               <p className="text-gray-600 mt-6">
                 {error}
               </p>
               <Button onClick={() => window.location.reload()} variant="primary">
-                再試行
+                Retry
               </Button>
             </div>
           </div>

@@ -27,7 +27,7 @@ export const useSuggestions = (): UseSuggestionsReturn => {
     // 入力値の検証
     const totalBeads = Object.values(beadCounts).reduce((sum, count) => sum + count, 0);
     if (totalBeads === 0) {
-      setError('ビーズ数を1個以上入力してください');
+      setError('Please enter at least one bead');
       return [];
     }
 
@@ -40,7 +40,7 @@ export const useSuggestions = (): UseSuggestionsReturn => {
       setPatterns(result);
       
       if (result.length === 0) {
-        setError('指定されたビーズ数で作成可能な図案が見つかりませんでした');
+        setError('No patterns found for the specified bead counts');
       }
       
       return result;
@@ -49,16 +49,16 @@ export const useSuggestions = (): UseSuggestionsReturn => {
       
       if (err instanceof Error) {
         if (err.message.includes('Failed to fetch')) {
-          setError('サーバーに接続できませんでした。ネットワーク接続を確認してください。');
+          setError('Could not connect to server. Please check your network connection.');
         } else if (err.message.includes('500')) {
-          setError('サーバーでエラーが発生しました。しばらく時間をおいて再度お試しください。');
+          setError('Server error occurred. Please try again later.');
         } else if (err.message.includes('404')) {
-          setError('APIエンドポイントが見つかりません。');
+          setError('API endpoint not found.');
         } else {
-          setError(`エラーが発生しました: ${err.message}`);
+          setError(`An error occurred: ${err.message}`);
         }
       } else {
-        setError('予期しないエラーが発生しました');
+        setError('An unexpected error occurred');
       }
       
       return [];
