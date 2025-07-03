@@ -17,7 +17,8 @@ describe('API Utils', () => {
         black: 2,
         white: 15,
         pink: 0,
-        brown: 1
+        brown: 1,
+        null: 0
       };
 
       const result = beadCountsToQueryParams(beadCounts);
@@ -41,7 +42,7 @@ describe('API Utils', () => {
     it('全て0の場合は空文字列を返す', () => {
       const beadCounts: BeadCounts = {
         red: 0, orange: 0, yellow: 0, green: 0, blue: 0,
-        purple: 0, black: 0, white: 0, pink: 0, brown: 0
+        purple: 0, black: 0, white: 0, pink: 0, brown: 0, null: 0
       };
 
       const result = beadCountsToQueryParams(beadCounts);
@@ -54,6 +55,7 @@ describe('API Utils', () => {
       const apiResponse = [
         {
           pattern: 'w'.repeat(256),
+          title: 'テスト図案1',
           beads: {
             white: 200,
             red: 30,
@@ -62,6 +64,7 @@ describe('API Utils', () => {
         },
         {
           pattern: 'r'.repeat(256),
+          title: 'テスト図案2',
           beads: {
             red: 256
           } as Record<string, number>
@@ -74,6 +77,7 @@ describe('API Utils', () => {
       
       // 1つ目のパターン
       expect(result[0].id).toBe('test-1');
+      expect(result[0].title).toBe('テスト図案1');
       expect(result[0].pattern).toBe('w'.repeat(256));
       expect(result[0].beadCounts.white).toBe(200);
       expect(result[0].beadCounts.red).toBe(30);
@@ -82,6 +86,7 @@ describe('API Utils', () => {
 
       // 2つ目のパターン
       expect(result[1].id).toBe('test-2');
+      expect(result[1].title).toBe('テスト図案2');
       expect(result[1].pattern).toBe('r'.repeat(256));
       expect(result[1].beadCounts.red).toBe(256);
       expect(result[1].beadCounts.white).toBe(0); // 未使用色
@@ -102,6 +107,7 @@ describe('API Utils', () => {
       const mockResponse = [
         {
           pattern: 'wrb' + 'n'.repeat(253),
+          title: 'テスト図案',
           beads: { 
             white: 1, 
             red: 1, 
@@ -119,7 +125,7 @@ describe('API Utils', () => {
       
       const beadCounts: BeadCounts = {
         red: 10, orange: 0, yellow: 0, green: 0, blue: 5,
-        purple: 0, black: 0, white: 8, pink: 0, brown: 0
+        purple: 0, black: 0, white: 8, pink: 0, brown: 0, null: 0
       };
 
       const result = await fetchSuggestions(beadCounts);
@@ -148,7 +154,7 @@ describe('API Utils', () => {
       
       const beadCounts: BeadCounts = {
         red: 10, orange: 0, yellow: 0, green: 0, blue: 0,
-        purple: 0, black: 0, white: 0, pink: 0, brown: 0
+        purple: 0, black: 0, white: 0, pink: 0, brown: 0, null: 0
       };
 
       await expect(fetchSuggestions(beadCounts)).rejects.toThrow('HTTP error! status: 500');
@@ -161,7 +167,7 @@ describe('API Utils', () => {
       
       const beadCounts: BeadCounts = {
         red: 10, orange: 0, yellow: 0, green: 0, blue: 0,
-        purple: 0, black: 0, white: 0, pink: 0, brown: 0
+        purple: 0, black: 0, white: 0, pink: 0, brown: 0, null: 0
       };
 
       await expect(fetchSuggestions(beadCounts)).rejects.toThrow('Failed to fetch');

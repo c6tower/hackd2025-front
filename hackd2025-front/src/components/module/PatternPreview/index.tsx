@@ -4,6 +4,8 @@ import { PatternGrid } from '@/components/module/PatternGrid';
 interface PatternPreviewProps {
   /** パターンID */
   id: string;
+  /** タイトル */
+  title: string;
   /** 256文字の図案データ */
   pattern: string;
   /** 選択状態 */
@@ -18,6 +20,7 @@ interface PatternPreviewProps {
  */
 export const PatternPreview: React.FC<PatternPreviewProps> = ({
   id,
+  title,
   pattern,
   selected,
   onSelect
@@ -38,6 +41,13 @@ export const PatternPreview: React.FC<PatternPreviewProps> = ({
           onClick={handleClick}
           patternId={id}
         />
+      </div>
+      
+      {/* タイトル */}
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          {title}
+        </h3>
       </div>
     </div>
   );

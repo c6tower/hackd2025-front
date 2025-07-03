@@ -31,6 +31,7 @@ jest.mock('@/components/module/PatternGrid', () => ({
 describe('PatternPreview', () => {
   const mockProps = {
     id: '1',
+    title: 'テスト図案',
     pattern: 'w'.repeat(256),
     selected: false,
     onSelect: jest.fn()
@@ -54,6 +55,12 @@ describe('PatternPreview', () => {
       expect(patternGrid).toHaveAttribute('data-interactive', 'true');
       expect(patternGrid).toHaveAttribute('data-selected', 'false');
       expect(patternGrid).toHaveAttribute('data-pattern-id', '1');
+    });
+
+    it('タイトルが正しく表示される', () => {
+      render(<PatternPreview {...mockProps} />);
+      
+      expect(screen.getByText('テスト図案')).toBeInTheDocument();
     });
   });
 
