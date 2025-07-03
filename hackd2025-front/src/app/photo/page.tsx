@@ -177,6 +177,10 @@ export default function PhotoPage() {
     try {
       const file = event.target.files?.[0]
       if (file && file.type.startsWith('image/')) {
+        // ファイルが選択されたらカメラを停止
+        stopCamera()
+        setCameraError(null)
+        
         const reader = new FileReader()
         reader.onload = (e) => {
           try {
@@ -220,6 +224,9 @@ export default function PhotoPage() {
     } catch {
       setCameraError('ファイル選択でエラーが発生しました')
     }
+    
+    // ファイル入力をリセット（同じファイルを再選択できるようにする）
+    event.target.value = ''
   }
 
   const openFileDialog = () => {
