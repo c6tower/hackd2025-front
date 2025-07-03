@@ -248,14 +248,41 @@ export default function PhotoPage() {
 
   const goToBeadInput = () => {
     try {
+      console.log('goToBeadInput実行開始');
+      console.log('beadCounts:', beadCounts);
+      
       if (beadCounts) {
         // ビーズカウントデータをセッションストレージに保存
         const dataToSave = JSON.stringify(beadCounts);
+        console.log('保存するデータ:', dataToSave);
+        
+        // 保存前にクリア
+        sessionStorage.removeItem('beadCounts');
+        
+        // 保存
         sessionStorage.setItem('beadCounts', dataToSave);
+        console.log('sessionStorageに保存完了');
+        
+        // 保存後に確認
+        const saved = sessionStorage.getItem('beadCounts');
+        console.log('保存確認:', saved);
+        
+        // URLパラメータも併用（バックアップ）
+        const encodedData = encodeURIComponent(dataToSave);
+        console.log('URLパラメータ用データ:', encodedData);
+        
+        // 少し待ってから遷移
+        setTimeout(() => {
+          console.log('ホーム画面に遷移します');
+          router.push(`/?camera_data=${encodedData}`);
+        }, 100);
+      } else {
+        console.log('beadCountsが空です');
+        router.push('/');
       }
-      router.push('/')
-    } catch {
-      router.push('/')
+    } catch (error) {
+      console.error('goToBeadInputでエラー:', error);
+      router.push('/');
     }
   }
 

@@ -15,6 +15,12 @@ export const BEAD_COLORS = {
 
 export type BeadColor = keyof typeof BEAD_COLORS;
 
+// ビーズ色の順序定義（入力フォーム用）
+export const BEAD_COLORS_ORDER: BeadColor[] = [
+  'red', 'orange', 'yellow', 'green', 'blue', 
+  'purple', 'black', 'white', 'pink', 'brown'
+] as const;
+
 // ビーズ入力コンポーネントのProps
 export interface BeadInputProps {
   color: BeadColor;
@@ -149,19 +155,40 @@ export const BEAD_COLOR_API_NAMES: Record<BeadColor, string> = {
   null: 'null'      // APIでは"null"を使用
 } as const;
 
-// APIの色名からBeadColorへの逆マッピング
+// APIの色名からBeadColorへの逆マッピング（包括的）
 export const API_NAME_TO_BEAD_COLOR: Record<string, BeadColor> = {
+  // 基本的な色名
   red: 'red',
   orange: 'orange',
   yellow: 'yellow',
   green: 'green',
   blue: 'blue',
   violet: 'purple',
+  purple: 'purple',
   dark: 'black',
+  black: 'black',
   white: 'white',
   pink: 'pink',
   maroon: 'brown',
-  null: 'null'
+  brown: 'brown',
+  null: 'null',
+  
+  // APIで返される可能性のある色名のバリエーション
+  maron: 'brown',
+  gray: 'black',
+  grey: 'black',
+  lime: 'green',
+  navy: 'blue',
+  beige: 'white',
+  cream: 'white',
+  crimson: 'red',
+  scarlet: 'red',
+  rose: 'pink',
+  magenta: 'pink',
+  cyan: 'blue',
+  gold: 'yellow',
+  silver: 'white',
+  light: 'white'
 } as const;
 
 // CSS変数を含むCSSPropertiesの型定義
