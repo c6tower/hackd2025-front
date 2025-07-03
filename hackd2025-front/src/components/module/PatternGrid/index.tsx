@@ -44,7 +44,7 @@ export const PatternGrid: React.FC<PatternGridProps> = ({
     return rows;
   }, [pattern]);
 
-  const containerSize = size === 'small' ? 'w-32 h-32' : 'w-80 h-80';
+  const containerSize = size === 'small' ? 'w-32 h-32' : 'w-90 h-90';
   
   return (
     <div className="relative">
