@@ -90,11 +90,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.1rem;
   background: white;
   border: none;
-  border-radius: 80px;
-  padding: 0.5rem 0.75rem;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -227,9 +229,9 @@
   }
 
   .homeButton {
-    padding: 0.5rem 0.75rem;
+    width: 70px;
+    height: 70px;
     font-size: 11px;
-    border-radius: 60px;
     gap: 0.05rem;
   }
   
