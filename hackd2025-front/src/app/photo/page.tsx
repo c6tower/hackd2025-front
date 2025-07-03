@@ -23,6 +23,11 @@ export default function PhotoPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
+  // ページマウント時に自動でカメラを起動
+  useEffect(() => {
+    startCamera()
+  }, [])
+
   // ストリームの設定を監視するuseEffect
   useEffect(() => {
     if (isCapturing && videoRef.current && streamRef.current) {
@@ -50,6 +55,7 @@ export default function PhotoPage() {
   const startCamera = async () => {
     try {
       setError(null)
+      setIsCapturing(true) // カメラボタンを押した瞬間に状態を変更
       
       // WebRTC対応チェック
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -58,7 +64,9 @@ export default function PhotoPage() {
       
       // 最も基本的な制約で開始（成功率を上げるため）
       const constraints = { 
-        video: true
+        video: {
+          facingMode: 'environment' // 可能であれば背面カメラを使用
+        }
       }
 
       // まず基本的な設定でテスト
@@ -69,143 +77,33 @@ export default function PhotoPage() {
         
         // ストリームが有効か確認
         if (stream && stream.active) {
-          // ビデオ要素をリセット
-          video.srcObject = null
-          video.removeAttribute('src')
-          video.load()
-          
-          // 短い待機後にストリームを設定
-          await new Promise(resolve => setTimeout(resolve, 100))
-          
-          // ビデオ要素の強制的な属性設定（ストリーム設定前）
+          // ビデオ要素の設定
           video.setAttribute('playsinline', 'true')
           video.setAttribute('autoplay', 'true')
           video.setAttribute('muted', 'true')
-          video.style.display = 'block'
-          video.style.visibility = 'visible'
-          video.style.opacity = '1'
           
-          // srcObjectを設定（型キャストを使用）
+          // srcObjectを設定
           try {
             video.srcObject = stream as MediaProvider
           } catch {
-            // 代替方法として直接設定を試行
-            try {
-              const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
-              videoElement.srcObject = stream
-            } catch {
-              throw new Error('ストリームの設定に失敗しました')
-            }
+            const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
+            videoElement.srcObject = stream
           }
+          
+          // 再生を開始
+          video.play().catch(() => {
+            // 自動再生に失敗した場合でも続行
+          })
         } else {
+          setIsCapturing(false)
           return
-        }
-        
-        // ビデオが読み込まれるまで待機
-        await new Promise((resolve, reject) => {
-          let resolved = false
-          
-          const handleLoad = () => {
-            if (!resolved) {
-              resolved = true
-              resolve(true)
-            }
-          }
-          
-          const handleError = () => {
-            if (!resolved) {
-              resolved = true
-              // srcObjectが設定されていない場合は再試行
-              if (!video.srcObject && stream && stream.active) {
-                try {
-                  video.srcObject = stream as MediaProvider
-                } catch {
-                  const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
-                  videoElement.srcObject = stream
-                }
-                setTimeout(() => {
-                  if (video.srcObject) {
-                    resolve(true)
-                  } else {
-                    reject(new Error('ビデオの読み込みに失敗しました'))
-                  }
-                }, 500)
-              } else {
-                reject(new Error('ビデオの読み込みに失敗しました'))
-              }
-            }
-          }
-          
-          video.onloadedmetadata = handleLoad
-          video.oncanplay = handleLoad
-          video.onerror = handleError
-          
-          // ビデオ要素の属性を再度強制設定
-          video.setAttribute('playsinline', 'true')
-          video.setAttribute('autoplay', 'true')
-          video.setAttribute('muted', 'true')
-          video.style.display = 'block'
-          video.style.visibility = 'visible'
-          video.style.opacity = '1'
-          
-          // 5秒でタイムアウト
-          setTimeout(() => {
-            if (!resolved) {
-              resolved = true
-              
-              // srcObjectが設定されていない場合は最後に一度試行
-              if (!video.srcObject && stream && stream.active) {
-                try {
-                  video.srcObject = stream as MediaProvider
-                } catch {
-                  const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
-                  videoElement.srcObject = stream
-                }
-                setTimeout(() => {
-                  resolve(true)
-                }, 200)
-              } else {
-                resolve(true)
-              }
-            }
-          }, 5000)
-        })
-        
-        // 明示的に再生を開始（複数回試行）
-        let playAttempts = 0
-        const maxAttempts = 3
-        
-        while (playAttempts < maxAttempts) {
-          try {
-            playAttempts++
-            
-            // 再生前にsrcObjectを確認
-            if (!video.srcObject && stream && stream.active) {
-              try {
-                video.srcObject = stream as MediaProvider
-              } catch {
-                const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
-                videoElement.srcObject = stream
-              }
-              await new Promise(resolve => setTimeout(resolve, 100))
-            }
-            
-            await video.play()
-            break
-          } catch {
-            if (playAttempts >= maxAttempts) {
-              // 最後の試行でも失敗した場合、手動再生を促す可能性がある
-            } else {
-              // 短い待機後に再試行
-              await new Promise(resolve => setTimeout(resolve, 500))
-            }
-          }
         }
       }
       
       streamRef.current = stream
-      setIsCapturing(true)
+      // setIsCapturing(true) // 既に上で設定済み
     } catch (err) {
+      setIsCapturing(false) // エラー時は状態をリセット
       let errorMessage = 'カメラへのアクセスが拒否されました'
       
       if (err instanceof Error) {
@@ -224,7 +122,7 @@ export default function PhotoPage() {
         }
       }
       
-      setError(errorMessage + ' 代わりにファイル選択をお試しください。')
+      setError(errorMessage + ' カメラを手動で起動するか、ファイル選択をお試しください。')
     }
   }
 
@@ -359,7 +257,7 @@ export default function PhotoPage() {
               <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
             </button>
             <button onClick={startCamera} className={styles.captureButton}>
-              撮影
+              再開
             </button>
             <button onClick={openFileDialog} className={styles.fileButton}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
