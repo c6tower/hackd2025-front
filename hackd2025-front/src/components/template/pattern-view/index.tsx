@@ -45,24 +45,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
     >
       <div className="app-container">
         <header className="text-center">
-          <div className="flex justify-between items-center">
-            {/* ステップタイトル */}
-            <h1 className="inline-block text-white font-bold rounded-full relative text-3xl px-8 py-4 bg-purple-400">
-              Step ②
-              <span className="absolute top-1/2 -translate-y-1/2 left-full -ml-1 w-0 h-0 border-t-[16px] border-b-[16px] border-l-[20px] border-transparent border-l-purple-400" />
-            </h1>
-            
-            {/* 言語切り替えボタン */}
-            {/* <div className="flex gap-2">
-              <button className="w-12 h-12 bg-purple-400 text-white text-xl font-bold rounded-full hover:opacity-80 transition-opacity">
-                日
-              </button>
-              <button className="w-12 h-12 bg-purple-400 text-white text-xl font-bold rounded-full hover:opacity-80 transition-opacity">
-                EN
-              </button>
-            </div> */}
-          </div>
-          
           <div className="inline-block text-gray-900 font-bold rounded-full text-2xl px-6 py-3 bg-white mt-4 sm:mt-6">
             Pick one you like.
           </div>
