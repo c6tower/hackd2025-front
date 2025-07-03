@@ -58,7 +58,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
       }}
     >
       <div className="app-container">
-        {/* ヘッダー */}
         <header className="text-center">
           <div className="flex justify-between items-center">
             {/* ステップタイトル */}
@@ -83,7 +82,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
           </div>
         </header>
 
-        {/* メインコンテンツ */}
         <main>
           {/* 図案グリッド */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 sm:mt-6">

@@ -12,8 +12,10 @@ export default function Home() {
 
   const handleSubmit = async (beadCounts: BeadCounts) => {
     console.log('ビーズ数:', beadCounts);
-    await getSuggestions(beadCounts);
-    if (!error && patterns.length > 0) {
+    const result = await getSuggestions(beadCounts);
+    
+    // 図案が取得できた場合のみ画面遷移
+    if (result.length > 0) {
       setCurrentScreen('patterns');
     }
   };

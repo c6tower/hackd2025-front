@@ -10,7 +10,7 @@ interface UseSuggestionsReturn {
   /** エラーメッセージ */
   error: string | null;
   /** 図案提案を取得する関数 */
-  getSuggestions: (beadCounts: BeadCounts) => Promise<void>;
+  getSuggestions: (beadCounts: BeadCounts) => Promise<PatternData[]>;
   /** 状態をリセットする関数 */
   reset: () => void;
 }
@@ -23,12 +23,12 @@ export const useSuggestions = (): UseSuggestionsReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getSuggestions = useCallback(async (beadCounts: BeadCounts) => {
+  const getSuggestions = useCallback(async (beadCounts: BeadCounts): Promise<PatternData[]> => {
     // 入力値の検証
     const totalBeads = Object.values(beadCounts).reduce((sum, count) => sum + count, 0);
     if (totalBeads === 0) {
       setError('ビーズ数を1個以上入力してください');
-      return;
+      return [];
     }
 
     setLoading(true);
@@ -42,6 +42,8 @@ export const useSuggestions = (): UseSuggestionsReturn => {
       if (result.length === 0) {
         setError('指定されたビーズ数で作成可能な図案が見つかりませんでした');
       }
+      
+      return result;
     } catch (err) {
       console.error('図案取得エラー:', err);
       
@@ -58,6 +60,8 @@ export const useSuggestions = (): UseSuggestionsReturn => {
       } else {
         setError('予期しないエラーが発生しました');
       }
+      
+      return [];
     } finally {
       setLoading(false);
     }
