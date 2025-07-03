@@ -12,8 +12,12 @@ export default function Home() {
 
   const handleSubmit = async (beadCounts: BeadCounts) => {
     console.log('ビーズ数:', beadCounts);
-    await getSuggestions(beadCounts);
-    setCurrentScreen('patterns');
+    const result = await getSuggestions(beadCounts);
+    
+    // 図案が取得できた場合のみ画面遷移
+    if (result.length > 0) {
+      setCurrentScreen('patterns');
+    }
   };
 
   const handleBack = () => {
@@ -21,24 +25,20 @@ export default function Home() {
     reset();
   };
 
-  const handleHome = () => {
-    setCurrentScreen('input');
-    reset();
-  };
-
-  if (currentScreen === 'patterns') {
+  if (currentScreen === 'patterns' && patterns.length > 0) {
     return (
       <PatternViewScreen
         patterns={patterns}
-        loading={loading}
-        error={error || undefined}
         onBack={handleBack}
-        onHome={handleHome}
       />
     );
   }
 
   return (
-    <BeadInputScreen onSubmit={handleSubmit} />
+    <BeadInputScreen 
+      onSubmit={handleSubmit}
+      loading={loading}
+      error={error || undefined}
+    />
   );
 }

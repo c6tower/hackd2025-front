@@ -1,11 +1,9 @@
 import React from 'react';
 import { PatternPreview } from '@/components/module/PatternPreview';
 import { PatternDetailModal } from '@/components/module/PatternDetailModal';
-import Button from '@/components/part/Button';
-import Loading from '@/components/part/Loading';
 import ActionButton from '@/components/part/ActionButton';
 import { BeadCounts } from '@/types/index';
-import backgroundImage from '@/assets/background.png';
+import backgroundImage from '@/assets/background2.png';
 import previousIcon from '@/assets/previous.png';
 
 interface PatternData {
@@ -17,26 +15,18 @@ interface PatternData {
 interface PatternViewScreenProps {
   /** 図案データのリスト */
   patterns: PatternData[];
-  /** ローディング状態 */
-  loading: boolean;
-  /** エラーメッセージ */
-  error?: string;
   /** 戻るボタンのコールバック */
   onBack: () => void;
-  /** ホームボタンのコールバック */
-  onHome: () => void;
 }
 
 /**
  * 図案選択画面のテンプレートコンポーネント
+ * 図案データが存在する場合のみ表示される
  * 最大4つの図案プレビューと詳細モーダルを表示
  */
 export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
   patterns,
-  loading,
-  error,
   onBack,
-  onHome
 }) => {
   const [selectedPatternId, setSelectedPatternId] = React.useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -52,55 +42,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
     setIsModalOpen(false);
   };
 
-  const handleModalHome = () => {
-    setIsModalOpen(false);
-    onHome();
-  };
-
-  if (loading) {
-    return (
-      <div 
-        className="min-h-screen bg-gray-50 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${backgroundImage.src})`
-        }}
-      >
-        <div className="app-container flex items-center justify-center">
-          <div className="text-center bg-white/90 p-8 rounded-xl">
-            <Loading />
-            <p className="mt-4 text-gray-600">図案を生成中...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div 
-        className="min-h-screen bg-gray-50 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${backgroundImage.src})`
-        }}
-      >
-        <div className="app-container flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto p-6 bg-white/90 rounded-xl">
-            <div className="text-red-500 text-6xl mt-4">⚠️</div>
-            <h2 className="text-xl font-semibold text-gray-900 mt-2">
-              エラーが発生しました
-            </h2>
-            <p className="text-gray-600 mt-6">
-              {error}
-            </p>
-            <Button onClick={onBack} variant="primary">
-              戻る
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div 
       className="min-h-screen bg-gray-50 bg-cover bg-center bg-no-repeat"
@@ -109,7 +50,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
       }}
     >
       <div className="app-container">
-        {/* ヘッダー */}
         <header className="text-center">
           <div className="flex justify-between items-center">
             {/* ステップタイトル */}
@@ -134,50 +74,29 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
           </div>
         </header>
 
-        {/* メインコンテンツ */}
         <main>
-          {/* 図案が存在しない場合 */}
-          {patterns.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="bg-white/90 p-8 rounded-xl max-w-md mx-auto">
-                <div className="text-gray-400 text-6xl mt-4">📝</div>
-                <h3 className="text-lg font-medium text-gray-900 mt-2">
-                  図案が見つかりませんでした
-                </h3>
-                <p className="text-gray-600 mt-6">
-                  ビーズの組み合わせを変更して再度お試しください
-                </p>
-                <Button onClick={onBack} variant="primary">
-                  ビーズ数を変更する
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* 図案グリッド */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 sm:mt-6">
-                {patterns.map((pattern) => (
-                  <PatternPreview
-                    key={pattern.id}
-                    id={pattern.id}
-                    pattern={pattern.pattern}
-                    selected={selectedPatternId === pattern.id}
-                    onSelect={handlePatternSelect}
-                  />
-                ))}
-              </div>
+          {/* 図案グリッド */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 sm:mt-6">
+            {patterns.map((pattern) => (
+              <PatternPreview
+                key={pattern.id}
+                id={pattern.id}
+                pattern={pattern.pattern}
+                selected={selectedPatternId === pattern.id}
+                onSelect={handlePatternSelect}
+              />
+            ))}
+          </div>
 
-              {/* アクションボタン */}
-              <div className="flex justify-center mt-4 sm:mt-6">
-                <ActionButton
-                  icon={previousIcon}
-                  text="Previous"
-                  alt="戻る"
-                  onClick={onBack}
-                />
-              </div>
-            </>
-          )}
+          {/* アクションボタン */}
+          <div className="flex justify-center mt-4 sm:mt-6">
+            <ActionButton
+              icon={previousIcon}
+              text="Previous"
+              alt="戻る"
+              onClick={onBack}
+            />
+          </div>
         </main>
 
         {/* 図案詳細モーダル */}
@@ -187,7 +106,6 @@ export const PatternViewScreen: React.FC<PatternViewScreenProps> = ({
             pattern={selectedPattern.pattern}
             beadCounts={selectedPattern.beadCounts}
             onClose={handleModalClose}
-            onHome={handleModalHome}
           />
         )}
       </div>

@@ -3,7 +3,7 @@ interface LoadingProps {
   text?: string;
 }
 
-export default function Loading({ size = 'md', text = '読み込み中...' }: LoadingProps) {
+export default function Loading({ size = 'md', text = '' }: LoadingProps) {
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',

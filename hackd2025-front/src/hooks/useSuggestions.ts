@@ -10,7 +10,7 @@ interface UseSuggestionsReturn {
   /** エラーメッセージ */
   error: string | null;
   /** 図案提案を取得する関数 */
-  getSuggestions: (beadCounts: BeadCounts) => Promise<void>;
+  getSuggestions: (beadCounts: BeadCounts) => Promise<PatternData[]>;
   /** 状態をリセットする関数 */
   reset: () => void;
 }
@@ -23,12 +23,12 @@ export const useSuggestions = (): UseSuggestionsReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getSuggestions = useCallback(async (beadCounts: BeadCounts) => {
+  const getSuggestions = useCallback(async (beadCounts: BeadCounts): Promise<PatternData[]> => {
     // 入力値の検証
     const totalBeads = Object.values(beadCounts).reduce((sum, count) => sum + count, 0);
     if (totalBeads === 0) {
-      setError('ビーズ数を1個以上入力してください');
-      return;
+      setError('Please enter at least one bead');
+      return [];
     }
 
     setLoading(true);
@@ -40,24 +40,28 @@ export const useSuggestions = (): UseSuggestionsReturn => {
       setPatterns(result);
       
       if (result.length === 0) {
-        setError('指定されたビーズ数で作成可能な図案が見つかりませんでした');
+        setError('No patterns found for the specified bead counts');
       }
+      
+      return result;
     } catch (err) {
       console.error('図案取得エラー:', err);
       
       if (err instanceof Error) {
         if (err.message.includes('Failed to fetch')) {
-          setError('サーバーに接続できませんでした。ネットワーク接続を確認してください。');
+          setError('Could not connect to server. Please check your network connection.');
         } else if (err.message.includes('500')) {
-          setError('サーバーでエラーが発生しました。しばらく時間をおいて再度お試しください。');
+          setError('Server error occurred. Please try again later.');
         } else if (err.message.includes('404')) {
-          setError('APIエンドポイントが見つかりません。');
+          setError('API endpoint not found.');
         } else {
-          setError(`エラーが発生しました: ${err.message}`);
+          setError(`An error occurred: ${err.message}`);
         }
       } else {
-        setError('予期しないエラーが発生しました');
+        setError('An unexpected error occurred');
       }
+      
+      return [];
     } finally {
       setLoading(false);
     }

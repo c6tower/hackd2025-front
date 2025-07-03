@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { BeadColor, BeadCounts } from '@/types';
 import BeadInput from '@/components/part/BeadInput';
 import ActionButton from '@/components/part/ActionButton';
+import Button from '@/components/part/Button';
+import Loading from '@/components/part/Loading';
 import backgroundImage from '@/assets/background.png';
 import resetIcon from '@/assets/reset.png';
 import nextIcon from '@/assets/next.png';
@@ -17,9 +19,13 @@ const BEAD_COLORS_ORDER: BeadColor[] = [
 
 interface BeadInputScreenProps {
   onSubmit?: (beadCounts: BeadCounts) => Promise<void> | void;
+  /** API通信のローディング状態 */
+  loading?: boolean;
+  /** エラーメッセージ */
+  error?: string;
 }
 
-export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
+export default function BeadInputScreen({ onSubmit, loading, error }: BeadInputScreenProps) {
   const router = useRouter();
   const [beadCounts, setBeadCounts] = useState<BeadCounts>(() => {
     const initialCounts = {} as BeadCounts;
@@ -164,10 +170,9 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
       }}
     >
       <div className="app-container">
-        {/* ステップタイトル */}
         <header className="text-center">
-          {/* タイトルと言語切り替えボタンの横並び */}
           <div className="flex justify-between items-center">
+            {/* ステップタイトル */}
             <h1 className="inline-block text-white font-bold rounded-full relative text-3xl px-8 py-4 bg-purple-400">
               ① Start !
               <span className="absolute top-1/2 -translate-y-1/2 left-full -ml-1 w-0 h-0 border-t-[16px] border-b-[16px] border-l-[20px] border-transparent border-l-purple-400" />
@@ -189,7 +194,6 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
           </div>
         </header>
 
-        {/* メインコンテンツ */}
         <main>
           {/* ビーズ入力フォーム */}
           <div className="mt-4 sm:mt-6">
@@ -207,8 +211,8 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
             </div>
           </div>
 
-          {/* アクションボタン */}
           <div className="mt-4 sm:mt-6">
+            {/* アクションボタン */}
             <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
               <ActionButton
                 icon={cameraIcon}
@@ -238,11 +242,39 @@ export default function BeadInputScreen({ onSubmit }: BeadInputScreenProps) {
             {/* ヘルプテキスト */}
             {!hasAnyBeads && (
               <div className="mt-6 text-center text-gray-500 text-xs sm:text-sm">
-                ビーズ数を1個以上設定してください
+                Please set at least one bead
               </div>
             )}
           </div>
         </main>
+
+        {/* ローディングオーバーレイ */}
+        {loading && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="text-center bg-white/90 p-8 rounded-xl">
+              <Loading />
+              {/* <p className="mt-4 text-gray-600">Generating patterns...</p> */}
+            </div>
+          </div>
+        )}
+
+        {/* エラーオーバーレイ */}
+        {error && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="text-center max-w-md mx-auto p-6 bg-white/90 rounded-xl">
+              <div className="text-red-500 text-6xl mt-4">⚠️</div>
+              <h2 className="text-xl font-semibold text-gray-900 mt-2">
+                An error occurred
+              </h2>
+              <p className="text-gray-600 mt-6">
+                {error}
+              </p>
+              <Button onClick={() => window.location.reload()} variant="primary">
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

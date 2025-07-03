@@ -55,7 +55,8 @@ export const convertApiResponseToPatternData = (
       black: 0,
       white: 0,
       pink: 0,
-      brown: 0
+      brown: 0,
+      null: 0
     };
 
     // APIレスポンスのフルネームをフロントエンド色名に変換
