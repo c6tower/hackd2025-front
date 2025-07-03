@@ -1,15 +1,15 @@
 // ビーズ色定義（11色：無色を含む）
 export const BEAD_COLORS = {
-  red: '#FF0000',
-  orange: '#FFA500', 
-  yellow: '#FFFF00',
-  green: '#008000',
-  blue: '#0000FF',
-  purple: '#800080',
-  black: '#000000',
+  red: '#F54346',
+  orange: '#FF9D47', 
+  yellow: '#FFEF3C',
+  green: '#3BB952',
+  blue: '#1792DC',
+  purple: '#CB93FA',
+  black: '#2E2E2E',
   white: '#FFFFFF',
-  pink: '#FFC0CB',
-  brown: '#A52A2A',
+  pink: '#FF5DFC',
+  brown: '#743906',
   null: 'transparent' // 無色（透明）
 } as const;
 
