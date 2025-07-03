@@ -298,7 +298,6 @@ export default function PhotoPage() {
               muted
               className={styles.video}
               style={{
-                transform: 'scaleX(-1)', // フロントカメラの場合にミラー表示
                 objectFit: 'cover',
                 display: 'block',
                 visibility: 'visible',
