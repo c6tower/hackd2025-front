@@ -49,13 +49,23 @@ export default function PhotoPage() {
   const capturePhoto = () => {
     if (!videoRef.current) return
 
+    const video = videoRef.current
+    const videoWidth = video.videoWidth
+    const videoHeight = video.videoHeight
+    
+    // 正方形にクロップするための計算
+    const size = Math.min(videoWidth, videoHeight)
+    const offsetX = (videoWidth - size) / 2
+    const offsetY = (videoHeight - size) / 2
+
     const canvas = document.createElement('canvas')
-    canvas.width = videoRef.current.videoWidth
-    canvas.height = videoRef.current.videoHeight
+    canvas.width = size
+    canvas.height = size
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    ctx.drawImage(videoRef.current, 0, 0)
+    // 正方形にクロップして描画
+    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size)
     const imageData = canvas.toDataURL('image/jpeg')
     setCapturedImage(imageData)
     stopCamera()
@@ -129,12 +139,14 @@ export default function PhotoPage() {
 
       {isCapturing && (
         <div className={styles.cameraSection}>
-          <video 
-            ref={videoRef} 
-            autoPlay 
-            playsInline 
-            className={styles.video}
-          />
+          <div className={styles.videoContainer}>
+            <video 
+              ref={videoRef} 
+              autoPlay 
+              playsInline 
+              className={styles.video}
+            />
+          </div>
           <div className={styles.bottomControls}>
             <button onClick={stopCamera} className={styles.homeButton}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

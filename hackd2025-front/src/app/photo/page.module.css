@@ -7,7 +7,11 @@
 }
 
 .startSection,
-.cameraSection,
+.cameraSection {
+  background-color: #000;
+}
+
+.startSection,
 .previewSection,
 .resultSection {
   display: flex;
@@ -28,10 +32,29 @@
 .cameraIcon {
   width: 120px;
   height: 120px;
-  color: white;
+  color: #666;
 }
 
-.video,
+.videoContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  height: 80vw;
+  max-width: 400px;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .preview,
 .resultImage {
   width: 100%;
