@@ -111,7 +111,11 @@ export default function BeadInput({
           style={{
             background: `linear-gradient(to right, ${BEAD_COLORS[color]} 0%, ${BEAD_COLORS[color]} ${getBackgroundProgress()}%, #e5e7eb ${getBackgroundProgress()}%, #e5e7eb 100%)`,
             borderRadius: '9999px',
-            '--bead-color': BEAD_COLORS[color]
+            '--bead-color': BEAD_COLORS[color],
+            // 白いビーズの場合は中間リングを黒に、その他は白に
+            '--middle-ring-color': color === 'white' ? 'black' : 'white',
+            // 白いビーズの場合はつまみに影を追加
+            '--thumb-shadow': color === 'white' ? '0 0 0 1px rgba(0,0,0,0.3)' : '0 0 0 1px rgba(0,0,0,0.1)'
           } as CSSPropertiesWithVars}
           aria-label={`${BEAD_COLOR_NAMES[color]}の個数を設定`}
         />
