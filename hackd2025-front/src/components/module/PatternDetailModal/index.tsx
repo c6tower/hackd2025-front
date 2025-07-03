@@ -27,6 +27,10 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
   // モーダルのフォーカストラップ用
   const modalRef = React.useRef<HTMLDivElement>(null);
   const firstFocusableRef = React.useRef<HTMLButtonElement>(null);
+  
+  // アニメーション状態管理
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [shouldRender, setShouldRender] = React.useState(false);
 
   // 使用されている色のビーズ数リスト（0より大きいもののみ）
   const usedBeadCounts = React.useMemo(() => {
@@ -36,9 +40,28 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
       .map(([color, count]) => ({ color: color as BeadColor, count }));
   }, [beadCounts]);
 
+  // アニメーション状態管理
+  React.useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      // 次のフレームでアニメーション開始
+      const timeoutId = setTimeout(() => {
+        setIsVisible(true);
+      }, 10);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setIsVisible(false);
+      // アニメーション終了後にDOMから削除
+      const timeoutId = setTimeout(() => {
+        setShouldRender(false);
+      }, 200); // アニメーション時間と同じ
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isOpen]);
+
   // Escキーでモーダルを閉じる
   React.useEffect(() => {
-    if (!isOpen) return;
+    if (!shouldRender) return;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -48,18 +71,18 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  }, [shouldRender, onClose]);
 
   // モーダルが開いたときにフォーカスを設定
   React.useEffect(() => {
-    if (isOpen && firstFocusableRef.current) {
+    if (isVisible && firstFocusableRef.current) {
       firstFocusableRef.current.focus();
     }
-  }, [isOpen]);
+  }, [isVisible]);
 
   // フォーカストラップ
   React.useEffect(() => {
-    if (!isOpen) return;
+    if (!shouldRender) return;
 
     const modal = modalRef.current;
     if (!modal) return;
@@ -88,7 +111,7 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
 
     document.addEventListener('keydown', handleTabKey);
     return () => document.removeEventListener('keydown', handleTabKey);
-  }, [isOpen]);
+  }, [shouldRender]);
 
   // 背景クリックでモーダルを閉じる
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -97,11 +120,13 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      className={`fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 transition-opacity duration-200 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -109,7 +134,9 @@ export const PatternDetailModal: React.FC<PatternDetailModalProps> = ({
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className={`bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transition-all duration-200 transform ${
+          isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
+        }`}
       >
         {/* ヘッダー */}
         <div className="flex justify-end p-4">
