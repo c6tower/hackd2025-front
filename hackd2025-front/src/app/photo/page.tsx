@@ -158,7 +158,6 @@ export default function PhotoPage() {
           <div className={styles.bottomControls}>
             <button onClick={() => router.push('/')} className={styles.homeButton}>
               <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
-              <span>ホーム</span>
             </button>
             <button onClick={startCamera} className={styles.captureButton}>
               撮影
@@ -182,7 +181,6 @@ export default function PhotoPage() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span>戻る</span>
             </button>
             <button onClick={capturePhoto} className={styles.captureButton}>
               撮影
@@ -199,7 +197,6 @@ export default function PhotoPage() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 1L23 23M16.72 16.72C15.2108 17.5291 13.6225 17.9998 12 18C5.17084 18 0.499847 12 0.499847 12C1.64419 9.21966 3.20467 6.66212 5.09799 4.5M9.87868 6.12C10.5481 5.74174 11.2704 5.50049 12 5.50049C14.5 5.50049 16.5 7.78049 16.5 10.5C16.5 11.3242 16.281 12.0954 15.9026 12.7518M12 18C18.8291 18 23.5001 12 23.5001 12C22.8764 10.45 22.1264 8.97204 21.2655 7.58" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span>撮り直す</span>
             </button>
             <button onClick={sendImageToAPI} disabled={isLoading} className={styles.captureButton}>
               {isLoading ? '処理中...' : '解析'}
@@ -223,7 +220,6 @@ export default function PhotoPage() {
           <div className={styles.bottomControls}>
             <button onClick={goToHome} className={styles.homeButton}>
               <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
-              <span>ホーム</span>
             </button>
             <button onClick={retakePhoto} className={styles.captureButton}>
               撮り直す
