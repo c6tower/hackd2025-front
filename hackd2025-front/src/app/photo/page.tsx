@@ -23,24 +23,49 @@ export default function PhotoPage() {
 
   const startCamera = async () => {
     try {
+      setError(null)
+      // まずカメラのアクセス権限を確認
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
       })
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream
+        // ビデオが読み込まれるまで待機
+        await new Promise((resolve) => {
+          if (videoRef.current) {
+            videoRef.current.onloadedmetadata = () => resolve(true)
+          }
+        })
       }
+      
       streamRef.current = stream
       setIsCapturing(true)
-      setError(null)
     } catch (err) {
-      setError('カメラへのアクセスが拒否されました')
+      let errorMessage = 'カメラへのアクセスが拒否されました'
+      
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError') {
+          errorMessage = 'カメラの使用許可が必要です。ブラウザの設定でカメラアクセスを許可してください。'
+        } else if (err.name === 'NotFoundError') {
+          errorMessage = 'カメラが見つかりません。デバイスにカメラが接続されているか確認してください。'
+        } else if (err.name === 'NotReadableError') {
+          errorMessage = 'カメラが他のアプリケーションで使用されています。'
+        }
+      }
+      
+      setError(errorMessage)
       console.error('Camera error:', err)
     }
   }
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current.getTracks().forEach((track: MediaStreamTrack) => track.stop())
       streamRef.current = null
     }
     setIsCapturing(false)
