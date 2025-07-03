@@ -17,6 +17,7 @@ export default function PhotoPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [beadCounts, setBeadCounts] = useState<BeadCountResponse | null>(null)
+  const [debugInfo, setDebugInfo] = useState<string>('')
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const router = useRouter()
@@ -24,29 +25,87 @@ export default function PhotoPage() {
   const startCamera = async () => {
     try {
       setError(null)
+      setDebugInfo('カメラ初期化開始...')
+      console.log('カメラ初期化開始...')
+      
+      // WebRTC対応チェック
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('お使いのブラウザはカメラ機能をサポートしていません')
+      }
+      
       // まずカメラのアクセス権限を確認
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const constraints = { 
         video: { 
           facingMode: 'environment',
           width: { ideal: 1920 },
           height: { ideal: 1080 }
         } 
-      })
+      }
+      
+      setDebugInfo('カメラアクセス権限を確認中...')
+      console.log('カメラストリーム取得中...', constraints)
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      console.log('カメラストリーム取得成功:', stream)
+      setDebugInfo('カメラストリーム取得成功')
       
       if (videoRef.current) {
+        setDebugInfo('ビデオ要素にストリームを設定中...')
+        console.log('ビデオ要素にストリームを設定中...')
         videoRef.current.srcObject = stream
+        
         // ビデオが読み込まれるまで待機
-        await new Promise((resolve) => {
+        await new Promise((resolve, reject) => {
           if (videoRef.current) {
-            videoRef.current.onloadedmetadata = () => resolve(true)
+            const video = videoRef.current
+            
+            video.onloadedmetadata = () => {
+              console.log('ビデオメタデータ読み込み完了:', {
+                videoWidth: video.videoWidth,
+                videoHeight: video.videoHeight,
+                readyState: video.readyState
+              })
+              setDebugInfo('ビデオメタデータ読み込み完了')
+              resolve(true)
+            }
+            
+            video.oncanplay = () => {
+              console.log('ビデオ再生可能状態')
+              setDebugInfo('ビデオ再生可能状態')
+            }
+            
+            video.onerror = (e: Event) => {
+              console.error('ビデオエラー:', e)
+              reject(new Error('ビデオの読み込みに失敗しました'))
+            }
+            
+            // 5秒でタイムアウト
+            setTimeout(() => {
+              reject(new Error('ビデオの読み込みがタイムアウトしました'))
+            }, 5000)
           }
         })
+        
+        setDebugInfo('ビデオ再生開始...')
+        console.log('ビデオ再生開始...')
+        // 明示的に再生を開始
+        try {
+          await videoRef.current.play()
+          console.log('ビデオ再生開始成功')
+          setDebugInfo('ビデオ再生開始成功')
+        } catch (playError) {
+          console.warn('自動再生に失敗しましたが、ユーザー操作で再生されます:', playError)
+          setDebugInfo('自動再生失敗、手動操作が必要')
+        }
       }
       
       streamRef.current = stream
       setIsCapturing(true)
+      setDebugInfo('カメラ初期化完了')
+      console.log('カメラ初期化完了')
     } catch (err) {
       let errorMessage = 'カメラへのアクセスが拒否されました'
+      
+      console.error('カメラエラー詳細:', err)
       
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
@@ -55,11 +114,14 @@ export default function PhotoPage() {
           errorMessage = 'カメラが見つかりません。デバイスにカメラが接続されているか確認してください。'
         } else if (err.name === 'NotReadableError') {
           errorMessage = 'カメラが他のアプリケーションで使用されています。'
+        } else if (err.message.includes('タイムアウト')) {
+          errorMessage = 'カメラの初期化がタイムアウトしました。再度お試しください。'
+        } else {
+          errorMessage = `カメラエラー: ${err.message}`
         }
       }
       
       setError(errorMessage)
-      console.error('Camera error:', err)
     }
   }
 
@@ -173,6 +235,7 @@ export default function PhotoPage() {
               ref={videoRef} 
               autoPlay 
               playsInline 
+              muted
               className={styles.video}
             />
           </div>
@@ -231,6 +294,23 @@ export default function PhotoPage() {
       {error && (
         <div className={styles.error}>
           {error}
+        </div>
+      )}
+
+      {debugInfo && process.env.NODE_ENV === 'development' && (
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          left: '10px',
+          right: '10px',
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '5px',
+          fontSize: '12px',
+          zIndex: 1000
+        }}>
+          デバッグ情報: {debugInfo}
         </div>
       )}
     </div>
