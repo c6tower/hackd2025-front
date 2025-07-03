@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import styles from './page.module.css'
@@ -17,76 +17,89 @@ export default function PhotoPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [beadCounts, setBeadCounts] = useState<BeadCountResponse | null>(null)
-  const [debugInfo, setDebugInfo] = useState<string>('')
+
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
+  // ストリームの設定を監視するuseEffect
+  useEffect(() => {
+    if (isCapturing && videoRef.current && streamRef.current) {
+      const video = videoRef.current
+      const stream = streamRef.current
+      
+      // 定期的にsrcObjectの状態をチェック
+      const checkInterval = setInterval(() => {
+        if (!video.srcObject && stream && stream.active) {
+          try {
+            video.srcObject = stream as MediaProvider
+          } catch {
+            const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
+            videoElement.srcObject = stream
+          }
+        }
+      }, 1000)
+      
+      return () => {
+        clearInterval(checkInterval)
+      }
+    }
+  }, [isCapturing])
+
   const startCamera = async () => {
     try {
       setError(null)
-      setDebugInfo('カメラ初期化開始...')
-      console.log('カメラ初期化開始...')
-      
-      // 詳細な環境情報をログ出力
-      console.log('環境情報:', {
-        userAgent: navigator.userAgent,
-        isSecureContext: window.isSecureContext,
-        protocol: window.location.protocol,
-        mediaDevices: !!navigator.mediaDevices,
-        getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-      })
       
       // WebRTC対応チェック
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error(`お使いのブラウザはカメラ機能をサポートしていません。プロトコル: ${window.location.protocol}`)
       }
       
-      // HTTPS チェック
-      if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-        setDebugInfo('⚠️ HTTPSではありません。カメラアクセスが制限される可能性があります')
-        console.warn('HTTPS以外の環境:', window.location.protocol)
-      }
-      
       // 最も基本的な制約で開始（成功率を上げるため）
-      let constraints = { 
+      const constraints = { 
         video: true
       }
 
-      setDebugInfo('基本的なカメラアクセスをテスト中...')
-      console.log('基本的なカメラアクセスをテスト中...', constraints)
-      
       // まず基本的な設定でテスト
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      console.log('カメラストリーム取得成功:', stream)
-      
-      // ストリームの詳細情報をログ出力
-      const tracks = stream.getVideoTracks()
-      if (tracks.length > 0) {
-        const track = tracks[0]
-        const settings = track.getSettings()
-        console.log('ビデオトラック設定:', settings)
-        setDebugInfo(`カメラストリーム取得成功 - ${settings.width}x${settings.height}`)
-      } else {
-        console.warn('ビデオトラックが見つかりません')
-        setDebugInfo('ビデオトラックが見つかりません')
-      }
       
       if (videoRef.current) {
-        setDebugInfo('ビデオ要素にストリームを設定中...')
-        console.log('ビデオ要素にストリームを設定中...')
-        
         const video = videoRef.current
-        video.srcObject = stream
         
-        // ビデオ要素の状態をチェック
-        console.log('ビデオ要素の初期状態:', {
-          srcObject: video.srcObject,
-          readyState: video.readyState,
-          videoWidth: video.videoWidth,
-          videoHeight: video.videoHeight
-        })
+        // ストリームが有効か確認
+        if (stream && stream.active) {
+          // ビデオ要素をリセット
+          video.srcObject = null
+          video.removeAttribute('src')
+          video.load()
+          
+          // 短い待機後にストリームを設定
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
+          // ビデオ要素の強制的な属性設定（ストリーム設定前）
+          video.setAttribute('playsinline', 'true')
+          video.setAttribute('autoplay', 'true')
+          video.setAttribute('muted', 'true')
+          video.style.display = 'block'
+          video.style.visibility = 'visible'
+          video.style.opacity = '1'
+          
+          // srcObjectを設定（型キャストを使用）
+          try {
+            video.srcObject = stream as MediaProvider
+          } catch {
+            // 代替方法として直接設定を試行
+            try {
+              const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
+              videoElement.srcObject = stream
+            } catch {
+              throw new Error('ストリームの設定に失敗しました')
+            }
+          }
+        } else {
+          return
+        }
         
         // ビデオが読み込まれるまで待機
         await new Promise((resolve, reject) => {
@@ -95,21 +108,31 @@ export default function PhotoPage() {
           const handleLoad = () => {
             if (!resolved) {
               resolved = true
-              console.log('ビデオメタデータ読み込み完了:', {
-                videoWidth: video.videoWidth,
-                videoHeight: video.videoHeight,
-                readyState: video.readyState
-              })
-              setDebugInfo(`ビデオ表示準備完了 - ${video.videoWidth}x${video.videoHeight}`)
               resolve(true)
             }
           }
           
-          const handleError = (e: Event) => {
+          const handleError = () => {
             if (!resolved) {
               resolved = true
-              console.error('ビデオエラー:', e)
-              reject(new Error('ビデオの読み込みに失敗しました'))
+              // srcObjectが設定されていない場合は再試行
+              if (!video.srcObject && stream && stream.active) {
+                try {
+                  video.srcObject = stream as MediaProvider
+                } catch {
+                  const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
+                  videoElement.srcObject = stream
+                }
+                setTimeout(() => {
+                  if (video.srcObject) {
+                    resolve(true)
+                  } else {
+                    reject(new Error('ビデオの読み込みに失敗しました'))
+                  }
+                }, 500)
+              } else {
+                reject(new Error('ビデオの読み込みに失敗しました'))
+              }
             }
           }
           
@@ -117,22 +140,33 @@ export default function PhotoPage() {
           video.oncanplay = handleLoad
           video.onerror = handleError
           
-          // ビデオ要素の属性を強制設定
+          // ビデオ要素の属性を再度強制設定
           video.setAttribute('playsinline', 'true')
           video.setAttribute('autoplay', 'true')
           video.setAttribute('muted', 'true')
+          video.style.display = 'block'
+          video.style.visibility = 'visible'
+          video.style.opacity = '1'
           
           // 5秒でタイムアウト
           setTimeout(() => {
             if (!resolved) {
               resolved = true
-              console.log('タイムアウトしましたが続行します - ビデオサイズ:', {
-                videoWidth: video.videoWidth,
-                videoHeight: video.videoHeight,
-                srcObject: !!video.srcObject
-              })
-              setDebugInfo(`タイムアウト - 強制続行 (${video.videoWidth}x${video.videoHeight})`)
-              resolve(true)
+              
+              // srcObjectが設定されていない場合は最後に一度試行
+              if (!video.srcObject && stream && stream.active) {
+                try {
+                  video.srcObject = stream as MediaProvider
+                } catch {
+                  const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
+                  videoElement.srcObject = stream
+                }
+                setTimeout(() => {
+                  resolve(true)
+                }, 200)
+              } else {
+                resolve(true)
+              }
             }
           }, 5000)
         })
@@ -144,19 +178,22 @@ export default function PhotoPage() {
         while (playAttempts < maxAttempts) {
           try {
             playAttempts++
-            console.log(`ビデオ再生開始 (試行 ${playAttempts}/${maxAttempts})...`)
-            setDebugInfo(`ビデオ再生開始 (試行 ${playAttempts}/${maxAttempts})...`)
+            
+            // 再生前にsrcObjectを確認
+            if (!video.srcObject && stream && stream.active) {
+              try {
+                video.srcObject = stream as MediaProvider
+              } catch {
+                const videoElement = video as HTMLVideoElement & { srcObject: MediaStream }
+                videoElement.srcObject = stream
+              }
+              await new Promise(resolve => setTimeout(resolve, 100))
+            }
             
             await video.play()
-            
-            console.log('ビデオ再生開始成功')
-            setDebugInfo('ビデオ再生開始成功')
             break
-          } catch (playError) {
-            console.warn(`自動再生に失敗 (試行 ${playAttempts}):`, playError)
-            
+          } catch {
             if (playAttempts >= maxAttempts) {
-              setDebugInfo('自動再生失敗（手動再生が必要な可能性）')
               // 最後の試行でも失敗した場合、手動再生を促す可能性がある
             } else {
               // 短い待機後に再試行
@@ -168,17 +205,10 @@ export default function PhotoPage() {
       
       streamRef.current = stream
       setIsCapturing(true)
-      setDebugInfo('カメラ初期化完了')
-      console.log('カメラ初期化完了')
     } catch (err) {
       let errorMessage = 'カメラへのアクセスが拒否されました'
-      let debugMessage = ''
-      
-      console.error('カメラエラー詳細:', err)
       
       if (err instanceof Error) {
-        debugMessage = `エラー名: ${err.name}, メッセージ: ${err.message}`
-        
         if (err.name === 'NotAllowedError') {
           errorMessage = 'カメラの使用許可が必要です。ブラウザの設定でカメラアクセスを許可してください。'
         } else if (err.name === 'NotFoundError') {
@@ -195,7 +225,6 @@ export default function PhotoPage() {
       }
       
       setError(errorMessage + ' 代わりにファイル選択をお試しください。')
-      setDebugInfo(`❌ ${debugMessage}`)
     }
   }
 
@@ -258,15 +287,10 @@ export default function PhotoPage() {
       }
 
       const data: BeadCountResponse = await response.json()
-      console.log('APIから受信したビーズデータ:', data)
-      console.log('ビーズの色と個数:', data.beads)
       setBeadCounts(data)
-      setDebugInfo(`解析完了: ${Object.keys(data.beads).length}色のビーズを検出`)
-    } catch (err) {
+    } catch {
       const errorMessage = '画像の処理中にエラーが発生しました。カメラ機能やAPIサーバーが正常に動作していることを確認してください。'
       setError(errorMessage)
-      setDebugInfo(`APIエラー: ${err instanceof Error ? err.message : String(err)}`)
-      console.error('API error:', err)
     } finally {
       setIsLoading(false)
     }
@@ -278,7 +302,7 @@ export default function PhotoPage() {
     setError(null)
   }
 
-  const handleFileSelect = (event: any) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = event.target.files?.[0]
       if (file && file.type.startsWith('image/')) {
@@ -287,26 +311,19 @@ export default function PhotoPage() {
           try {
             const result = e.target?.result as string
             setCapturedImage(result)
-            setDebugInfo('ファイルから画像を読み込み完了')
-          } catch (error) {
-            console.error('ファイル読み込みエラー:', error)
+          } catch {
             setError('ファイルの読み込みに失敗しました')
-            setDebugInfo('ファイル読み込みエラー')
           }
         }
         reader.onerror = () => {
           setError('ファイルの読み込みに失敗しました')
-          setDebugInfo('FileReader エラー')
         }
         reader.readAsDataURL(file)
       } else {
         setError('有効な画像ファイルを選択してください')
-        setDebugInfo('無効なファイル形式')
       }
-    } catch (error) {
-      console.error('ファイル選択エラー:', error)
+    } catch {
       setError('ファイル選択でエラーが発生しました')
-      setDebugInfo('ファイル選択エラー')
     }
   }
 
@@ -320,17 +337,9 @@ export default function PhotoPage() {
         // ビーズカウントデータをセッションストレージに保存
         const dataToSave = JSON.stringify(beadCounts);
         sessionStorage.setItem('beadCounts', dataToSave);
-        console.log('ビーズデータをsessionStorageに保存しました:', beadCounts);
-        console.log('保存されたデータ:', dataToSave);
-        setDebugInfo('ビーズデータを保存してホームに移動中...');
-      } else {
-        console.log('保存するビーズデータがありません');
-        setDebugInfo('ビーズデータなしでホームに移動中...');
       }
       router.push('/')
-    } catch (error) {
-      console.error('ホームへの遷移でエラーが発生:', error)
-      setDebugInfo('エラーが発生しましたが、ホームに移動します')
+    } catch {
       router.push('/')
     }
   }
@@ -380,7 +389,10 @@ export default function PhotoPage() {
               className={styles.video}
               style={{
                 transform: 'scaleX(-1)', // フロントカメラの場合にミラー表示
-                objectFit: 'cover'
+                objectFit: 'cover',
+                display: 'block',
+                visibility: 'visible',
+                opacity: 1
               }}
             />
           </div>
@@ -399,7 +411,18 @@ export default function PhotoPage() {
 
       {capturedImage && !beadCounts && (
         <div className={styles.previewSection}>
-          <img src={capturedImage} alt="Captured" className={styles.preview} />
+          <Image 
+            src={capturedImage} 
+            alt="Captured" 
+            className={styles.preview}
+            width={400}
+            height={400}
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              height: 'auto'
+            }}
+          />
           <div className={styles.bottomControls}>
             <button onClick={retakePhoto} disabled={isLoading} className={styles.homeButton}>
               <svg width="20" height="20" viewBox="-7 -8 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -413,9 +436,20 @@ export default function PhotoPage() {
         </div>
       )}
 
-      {beadCounts && (
+      {beadCounts && capturedImage && (
         <div className={styles.resultSection}>
-          <img src={capturedImage} alt="Analyzed" className={styles.resultImage} />
+          <Image 
+            src={capturedImage} 
+            alt="Analyzed" 
+            className={styles.resultImage}
+            width={400}
+            height={400}
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              height: 'auto'
+            }}
+          />
           <h2 className={styles.resultTitle}>ビーズ数の計算結果</h2>
           <div className={styles.beadCounts}>
             {Object.entries(beadCounts.beads).map(([color, count]) => (
@@ -442,22 +476,6 @@ export default function PhotoPage() {
         </div>
       )}
 
-      {debugInfo && (
-        <div style={{
-          position: 'fixed',
-          top: '10px',
-          left: '10px',
-          right: '10px',
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '5px',
-          fontSize: '12px',
-          zIndex: 1000
-        }}>
-          デバッグ情報: {debugInfo}
-        </div>
-      )}
     </div>
   )
 }
