@@ -88,7 +88,7 @@ export default function PhotoPage() {
           videoHeight: video.videoHeight
         })
         
-        // ビデオが読み込まれるまで待機（シンプル化）
+        // ビデオが読み込まれるまで待機
         await new Promise((resolve, reject) => {
           let resolved = false
           
@@ -117,28 +117,52 @@ export default function PhotoPage() {
           video.oncanplay = handleLoad
           video.onerror = handleError
           
-          // 3秒でタイムアウト（短縮）
+          // ビデオ要素の属性を強制設定
+          video.setAttribute('playsinline', 'true')
+          video.setAttribute('autoplay', 'true')
+          video.setAttribute('muted', 'true')
+          
+          // 5秒でタイムアウト
           setTimeout(() => {
             if (!resolved) {
               resolved = true
-              console.log('タイムアウトしましたが続行します')
-              setDebugInfo('タイムアウト - 強制続行')
+              console.log('タイムアウトしましたが続行します - ビデオサイズ:', {
+                videoWidth: video.videoWidth,
+                videoHeight: video.videoHeight,
+                srcObject: !!video.srcObject
+              })
+              setDebugInfo(`タイムアウト - 強制続行 (${video.videoWidth}x${video.videoHeight})`)
               resolve(true)
             }
-          }, 3000)
+          }, 5000)
         })
         
-        // 明示的に再生を開始
-        try {
-          console.log('ビデオ再生開始...')
-          setDebugInfo('ビデオ再生開始...')
-          await video.play()
-          console.log('ビデオ再生開始成功')
-          setDebugInfo('ビデオ再生開始成功')
-        } catch (playError) {
-          console.warn('自動再生に失敗:', playError)
-          setDebugInfo('自動再生失敗（問題なし）')
-          // 自動再生の失敗は正常な動作なので続行
+        // 明示的に再生を開始（複数回試行）
+        let playAttempts = 0
+        const maxAttempts = 3
+        
+        while (playAttempts < maxAttempts) {
+          try {
+            playAttempts++
+            console.log(`ビデオ再生開始 (試行 ${playAttempts}/${maxAttempts})...`)
+            setDebugInfo(`ビデオ再生開始 (試行 ${playAttempts}/${maxAttempts})...`)
+            
+            await video.play()
+            
+            console.log('ビデオ再生開始成功')
+            setDebugInfo('ビデオ再生開始成功')
+            break
+          } catch (playError) {
+            console.warn(`自動再生に失敗 (試行 ${playAttempts}):`, playError)
+            
+            if (playAttempts >= maxAttempts) {
+              setDebugInfo('自動再生失敗（手動再生が必要な可能性）')
+              // 最後の試行でも失敗した場合、手動再生を促す可能性がある
+            } else {
+              // 短い待機後に再試行
+              await new Promise(resolve => setTimeout(resolve, 500))
+            }
+          }
         }
       }
       
@@ -317,6 +341,10 @@ export default function PhotoPage() {
               playsInline 
               muted
               className={styles.video}
+              style={{
+                transform: 'scaleX(-1)', // フロントカメラの場合にミラー表示
+                objectFit: 'cover'
+              }}
             />
           </div>
           <div className={styles.bottomControls}>
