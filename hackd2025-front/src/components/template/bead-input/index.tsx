@@ -155,7 +155,7 @@ export default function BeadInputScreen({
 
             {/* ヘルプテキスト */}
             {!hasAnyBeads && (
-              <div className="mt-6 text-center text-gray-500 text-xs sm:text-sm">
+              <div className="mt-6 text-center text-gray-500 text-base sm:text-lg">
                 Please set at least one bead
               </div>
             )}
