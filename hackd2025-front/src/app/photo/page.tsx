@@ -288,23 +288,15 @@ export default function PhotoPage() {
             <button onClick={() => router.push('/')} className={styles.homeButton}>
               <Image src="/home.png" alt="ホーム" width={128} height={128} priority />
             </button>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-              <button onClick={startCamera} className={styles.captureButton}>
-                撮影
-              </button>
-              <button onClick={openFileDialog} style={{
-                background: 'rgba(255,255,255,0.9)',
-                border: 'none',
-                borderRadius: '25px',
-                padding: '8px 16px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#333',
-                cursor: 'pointer'
-              }}>
-                📁 ファイル選択
-              </button>
-            </div>
+            <button onClick={startCamera} className={styles.captureButton}>
+              撮影
+            </button>
+            <button onClick={openFileDialog} className={styles.fileButton}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V9L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M13 2V9H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
           <input
             ref={fileInputRef}

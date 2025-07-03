@@ -154,6 +154,34 @@
   cursor: not-allowed;
 }
 
+.fileButton {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #007aff;
+  color: white;
+  border: 4px solid white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+  transition: all 0.2s;
+  position: absolute;
+  right: 2rem;
+  transform: translateY(-50%);
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fileButton:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.5);
+}
+
+.fileButton:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
 .resultTitle {
   position: absolute;
   top: 2rem;
@@ -246,6 +274,12 @@
   .homeButton svg {
     width: 80px;
     height: 80px;
+  }
+
+  .fileButton {
+    width: 70px;
+    height: 70px;
+    right: 1.5rem;
   }
 
   .beadCounts {
